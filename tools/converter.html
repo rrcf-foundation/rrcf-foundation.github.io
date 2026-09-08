@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>URDF/MJCF/SDF → RRCF Converter</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <style>
   :root{
     --bg:#0d1117; --panel:#141a21; --line:#232b33; --text:#d7dee5; --dim:#7b8794;
@@ -42,11 +44,10 @@
   .drop button, .toolbar button{background:var(--panel);color:var(--text);border:1px solid var(--line);padding:7px 14px;border-radius:4px;font-family:var(--mono);font-size:12px;cursor:pointer;}
   .drop button:hover, .toolbar button:hover{border-color:var(--accent);color:var(--accent);}
   input[type=file]{display:none;}
-  textarea, pre{width:100%;flex:1;background:var(--bg);color:var(--text);border:0;resize:none;font-family:var(--mono);font-size:12px;padding:16px;white-space:pre;overflow:auto;margin:0;}
-  .fields{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;}
+  .fields{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
   .fields label{color:var(--dim);font-size:11px;display:flex;flex-direction:column;gap:4px;}
   .fields input, .fields select{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:4px;padding:5px 8px;font-family:var(--mono);font-size:12px;min-width:150px;}
-  .toolbar{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;justify-content:space-between;}
+  .toolbar{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
   .badges{display:flex;gap:6px;flex-wrap:wrap;}
   .badge{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:2px 7px;font-size:10.5px;color:var(--dim);}
   .badge.cat{color:var(--accent2);border-color:var(--accent2);}
@@ -56,9 +57,15 @@
   .filelist code{color:var(--text);}
   .empty{color:var(--dim);text-align:center;padding:40px;font-size:12px;flex:1;display:flex;align-items:center;justify-content:center;}
   .empty.error{color:var(--danger);}
-  textarea#output{outline:none;}
-  textarea#output:focus{background:#0a0e13;}
   .badge.edited{color:#c792ea;border-color:#c792ea;}
+  .blank-row{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .blank-row .or{color:var(--dim);font-size:11px;}
+  .blank-row select{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:4px;padding:6px 8px;font-family:var(--mono);font-size:12px;}
+  /* CodeMirror editor panes fill the remaining pane height */
+  .editor-pane{flex:1;display:flex;flex-direction:column;min-height:0;}
+  .editor-pane .CodeMirror{flex:1;height:auto;font-family:var(--mono);font-size:12px;}
+  .CodeMirror{background:var(--bg)!important;}
+  .cm-s-material-darker.CodeMirror{background:var(--bg)!important;}
 </style>
 </head>
 <body>
@@ -131,7 +138,26 @@
       <input type="file" id="fileInput" accept=".xml,.urdf,.sdf" multiple>
     </div>
     <div class="filelist" id="filelist"></div>
-    <textarea id="srcText" placeholder="...or paste raw MJCF / URDF / SDF XML here" spellcheck="false"></textarea>
+    <div class="blank-row">
+      <span class="or">No URDF/MJCF/SDF to hand? Start from a blank template:</span>
+      <select id="blankTemplate">
+        <option value="">— pick a starting shape —</option>
+        <option value="wheeled">wheeled</option>
+        <option value="legged">legged</option>
+        <option value="loco_manip">loco_manip</option>
+        <option value="wheeled_humanoid">wheeled_humanoid</option>
+        <option value="full_humanoid">full_humanoid</option>
+        <option value="manipulator">manipulator</option>
+        <option value="aerial">aerial</option>
+        <option value="marine_surface">marine_surface</option>
+        <option value="marine_sub">marine_sub</option>
+        <option value="industrial_vehicle">industrial_vehicle</option>
+        <option value="agri_vehicle">agri_vehicle</option>
+        <option value="custom">custom</option>
+      </select>
+      <button id="blankBtn">Load blank template</button>
+    </div>
+    <div class="editor-pane" id="srcEditorWrap"></div>
   </div>
 
   <div class="pane">
@@ -162,8 +188,8 @@
       </label>
     </div>
     <div class="badges" style="padding:10px 16px 0;" id="badges"></div>
-    <div class="empty" id="outputEmpty">Load a robot description file to generate a draft .rrcf</div>
-    <textarea id="output" spellcheck="false" style="display:none;"></textarea>
+    <div class="empty" id="outputEmpty">Load a robot description file, or a blank template, to generate a draft .rrcf</div>
+    <div class="editor-pane" id="outputEditorWrap" style="display:none;"></div>
     <div class="toolbar">
       <span style="color:var(--dim);font-size:11px;" id="editHint">Draft only — see spec §11 before deploying</span>
       <div style="display:flex;gap:8px;">
@@ -175,6 +201,9 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
 <script>
 // ============================================================
 // Shared vocab + category guess (mirrors converters/common.py)
@@ -191,6 +220,50 @@ function classifyName(name) {
   if (ARM_WORDS.some(w => n.includes(w))) return 'arm';
   if (WHEEL_WORDS.some(w => n.includes(w))) return 'wheel';
   return 'other';
+}
+
+// ============================================================
+// Blank-template starting shapes — for authoring an .rrcf with no
+// URDF/MJCF/SDF at all. Each category gets a plausible-looking synthetic
+// "info" object (same shape analyzeMjcf/analyzeUrdf/analyzeSdf produce) so
+// buildRrcf() can stay format-agnostic instead of needing a second code
+// path just for the no-source case.
+// ============================================================
+const BLANK_SHAPES = {
+  wheeled:            { hasFreejoint: false, leg: 0, arm: 0, hand: 0, wheel: 2, other: 0 },
+  legged:             { hasFreejoint: true,  leg: 4, arm: 0, hand: 0, wheel: 0, other: 0 },
+  loco_manip:         { hasFreejoint: true,  leg: 4, arm: 6, hand: 0, wheel: 0, other: 0 },
+  wheeled_humanoid:   { hasFreejoint: false, leg: 0, arm: 6, hand: 2, wheel: 2, other: 0 },
+  full_humanoid:      { hasFreejoint: true,  leg: 4, arm: 6, hand: 2, wheel: 0, other: 0 },
+  manipulator:        { hasFreejoint: false, leg: 0, arm: 6, hand: 2, wheel: 0, other: 0 },
+  aerial:             { hasFreejoint: true,  leg: 0, arm: 0, hand: 0, wheel: 0, other: 4 },
+  marine_surface:     { hasFreejoint: true,  leg: 0, arm: 0, hand: 0, wheel: 0, other: 2 },
+  marine_sub:         { hasFreejoint: true,  leg: 0, arm: 0, hand: 0, wheel: 0, other: 4 },
+  industrial_vehicle: { hasFreejoint: false, leg: 0, arm: 1, hand: 0, wheel: 4, other: 0 },
+  agri_vehicle:       { hasFreejoint: false, leg: 0, arm: 0, hand: 0, wheel: 4, other: 1 },
+  custom:             { hasFreejoint: false, leg: 0, arm: 0, hand: 0, wheel: 0, other: 0 },
+};
+
+function blankInfoForCategory(cat) {
+  const shape = BLANK_SHAPES[cat] || BLANK_SHAPES.custom;
+  const buckets = { leg: [], arm: [], hand: [], wheel: [], other: [] };
+  const actuators = [];
+  const nameFor = (bucket, i) => `example_${bucket}_${i + 1}`;
+  ['leg', 'arm', 'hand', 'wheel', 'other'].forEach(bucket => {
+    for (let i = 0; i < shape[bucket]; i++) {
+      const name = nameFor(bucket, i);
+      buckets[bucket].push(name);
+      actuators.push({ name, ctrlrange: [-1, 1], bucket });
+    }
+  });
+  return {
+    hasFreejoint: shape.hasFreejoint,
+    buckets,
+    actuators,
+    sensors: [],
+    nu: actuators.length,
+    njnt: actuators.length,
+  };
 }
 
 function guessCategory(info) {
@@ -430,17 +503,26 @@ function buildRrcf(info, category, metaName, vendor, sourceFilename, sourceForma
   const handActuators = info.buckets.hand;
   const otherActuators = info.buckets.other;
   const byName = Object.fromEntries(info.actuators.map(a => [a.name, a]));
+  const isBlank = sourceFormat === 'blank';
 
   let out = [];
   out.push('<?xml version="1.0" encoding="UTF-8"?>');
   out.push(`<rrcf version="1.0" xmlns="https://rrcf.io/schema/1.0">`);
-  out.push(`  <!-- AUTO-GENERATED DRAFT via ${sourceFormat}_to_rrcf (browser) — verify before use. ${info.nu} actuators / ${info.njnt} joints in source ${sourceFormat.toUpperCase()}. Category is a heuristic guess unless overridden. -->`);
+  if (isBlank) {
+    out.push(`  <!-- BLANK TEMPLATE for category "${esc(cat)}" — no physical file involved. Every skill, safety limit, and transport value below is a placeholder; fill them in from your own robot's control docs, then delete this comment. -->`);
+  } else {
+    out.push(`  <!-- AUTO-GENERATED DRAFT via ${sourceFormat}_to_rrcf (browser) — verify before use. ${info.nu} actuators / ${info.njnt} joints in source ${sourceFormat.toUpperCase()}. Category is a heuristic guess unless overridden. -->`);
+  }
 
   out.push('  <meta>');
   out.push(`    <name>${esc(metaName)}</name>`);
   out.push(`    <vendor>${esc(vendor || 'Unknown — set vendor')}</vendor>`);
   out.push(`    <model>${esc(metaName)}</model>`);
-  out.push(`    <physical_ref format="${esc(sourceFormat)}" path="${esc(sourceFilename)}"/>`);
+  if (!isBlank) {
+    out.push(`    <physical_ref format="${esc(sourceFormat)}" path="${esc(sourceFilename)}"/>`);
+  } else {
+    out.push(`    <!-- <physical_ref format="urdf" path="your_robot.urdf"/>  optional — only if you have one and choose to reference it -->`);
+  }
   out.push('  </meta>');
 
   out.push(`  <primary category="${esc(cat)}">`);
@@ -545,35 +627,56 @@ function buildRrcf(info, category, metaName, vendor, sourceFilename, sourceForma
 // UI wiring
 // ============================================================
 let loadedFiles = {};
-let lastResult = null;   // { metaName } — the .rrcf text itself lives in the textarea, edits included
-let userEdited = false;  // true once the operator hand-edits the output textarea
+let lastResult = null;   // { metaName } — the .rrcf text itself lives in the output editor, edits included
+let userEdited = false;  // true once the operator hand-edits the output editor
+let lastMainName = null;
+let debounceTimer = null;
 
 const dropEl = document.getElementById('drop');
 const fileInput = document.getElementById('fileInput');
 const filelistEl = document.getElementById('filelist');
-const srcText = document.getElementById('srcText');
-const outputEl = document.getElementById('output');
 const outputEmptyEl = document.getElementById('outputEmpty');
 const badgesEl = document.getElementById('badges');
 const statusBadge = document.getElementById('statusBadge');
 const editHintEl = document.getElementById('editHint');
 
+// CodeMirror editors — replace what used to be two plain <textarea>s. Both
+// get real XML syntax highlighting, line numbers, and bracket matching.
+const srcEditor = CodeMirror(document.getElementById('srcEditorWrap'), {
+  mode: 'xml',
+  theme: 'material-darker',
+  lineNumbers: true,
+  matchBrackets: true,
+  placeholder: '...or paste raw MJCF / URDF / SDF XML here',
+  viewportMargin: Infinity,
+});
+const outputEditor = CodeMirror(document.getElementById('outputEditorWrap'), {
+  mode: 'xml',
+  theme: 'material-darker',
+  lineNumbers: true,
+  matchBrackets: true,
+  viewportMargin: Infinity,
+});
+
 function showOutput(text) {
   outputEmptyEl.style.display = 'none';
-  outputEl.style.display = 'block';
-  outputEl.value = text;
+  document.getElementById('outputEditorWrap').style.display = 'flex';
+  outputEditor.setValue(text);
+  outputEditor.refresh();
 }
 function showEmpty(message, isError) {
-  outputEl.style.display = 'none';
+  document.getElementById('outputEditorWrap').style.display = 'none';
   outputEmptyEl.style.display = 'flex';
   outputEmptyEl.textContent = message;
   outputEmptyEl.classList.toggle('error', !!isError);
 }
 
-// The output textarea is directly editable. Any manual edit is preserved —
-// regeneration from source/fields only happens on a new file drop or an
-// explicit "Reset to draft" click, never silently overwriting an edit.
-outputEl.addEventListener('input', () => {
+// The output editor is directly editable. Any manual edit is preserved —
+// regeneration from source/fields only happens on a new file drop, a blank
+// template load, or an explicit "Reset to draft" click, never silently
+// overwriting an edit.
+outputEditor.on('change', (instance, changeObj) => {
+  if (changeObj.origin === 'setValue') return; // programmatic update, not a hand-edit
   userEdited = true;
   editHintEl.textContent = 'Edited — "Reset to draft" discards changes and regenerates from source';
   badgesEl.querySelectorAll('.badge.edited').forEach(b => b.remove());
@@ -600,7 +703,7 @@ function handleFiles(fileListObj) {
       remaining--;
       if (remaining === 0) {
         renderFileList();
-        srcText.value = loadedFiles[files[0].name];
+        srcEditor.setValue(loadedFiles[files[0].name]);
         runConversion(files[0].name);
       }
     };
@@ -613,12 +716,20 @@ function renderFileList() {
   filelistEl.innerHTML = names.length ? 'Loaded: ' + names.map(n => `<code>${n}</code>`).join(', ') : '';
 }
 
-srcText.addEventListener('input', () => {
-  if (srcText.value.trim()) {
-    loadedFiles = { 'pasted.xml': srcText.value };
+// Live re-convert as the operator types/pastes into the source editor —
+// debounced so we're not re-parsing on every keystroke. This is what makes
+// "paste XML on the left" actually do something: previously the paste
+// handler existed but nothing surfaced that it re-ran on every keystroke.
+srcEditor.on('change', (instance, changeObj) => {
+  if (changeObj.origin === 'setValue') return; // programmatic (file load) — handled by its own caller
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    const value = srcEditor.getValue();
+    if (!value.trim()) return;
+    loadedFiles = { 'pasted.xml': value };
     renderFileList();
     runConversion('pasted.xml');
-  }
+  }, 300);
 });
 
 ['fName','fVendor','fCategory'].forEach(id => {
@@ -626,15 +737,47 @@ srcText.addEventListener('input', () => {
   document.getElementById(id).addEventListener('change', () => runConversion(lastMainName));
 });
 
-let lastMainName = null;
+// ------------------------------------------------------------------
+// Blank template — author an .rrcf with no URDF/MJCF/SDF at all
+// ------------------------------------------------------------------
+document.getElementById('blankBtn').onclick = () => {
+  const cat = document.getElementById('blankTemplate').value;
+  if (!cat) return;
+  loadedFiles = {}; // no source file — the editor's "blank:<cat>" pseudo-name signals this to runConversion
+  srcEditor.setValue('');
+  filelistEl.innerHTML = `Blank template: <code>${cat}</code> (no source file — edit the output directly)`;
+  document.getElementById('fCategory').value = cat;
+  userEdited = false;
+  runConversion('blank:' + cat, { force: true });
+};
 
 function runConversion(mainName, opts) {
   opts = opts || {};
   lastMainName = mainName;
-  if (!mainName || !loadedFiles[mainName]) return;
+  if (!mainName) return;
   // Don't clobber manual edits when a name/vendor/category field changes —
-  // only regenerate over the top when explicitly forced (new file, reset).
+  // only regenerate over the top when explicitly forced (new file, blank
+  // template, or reset).
   if (userEdited && !opts.force) return;
+
+  if (mainName.startsWith('blank:')) {
+    const cat = mainName.slice('blank:'.length);
+    const info = blankInfoForCategory(cat);
+    const nameField = document.getElementById('fName');
+    nameField.placeholder = 'my_robot';
+    const metaName = nameField.value || 'my_robot';
+    const vendor = document.getElementById('fVendor').value;
+    const rrcf = buildRrcf(info, cat, metaName, vendor, '', 'blank', cat);
+    lastResult = { metaName };
+    userEdited = false;
+    editHintEl.textContent = 'Blank template — every skill/safety/transport value is a placeholder. Edit freely, then Copy or Download.';
+    showOutput(rrcf);
+    badgesEl.innerHTML = `<span class="badge fmt">blank</span><span class="badge cat">category: ${cat}</span><span class="badge warn">no source file — all values placeholder</span>`;
+    statusBadge.textContent = '';
+    return;
+  }
+
+  if (!loadedFiles[mainName]) return;
   try {
     const parser = new DOMParser();
     let doc;
@@ -694,15 +837,19 @@ document.getElementById('resetBtn').onclick = () => {
 };
 
 document.getElementById('copyBtn').onclick = () => {
-  if (outputEl.style.display === 'none' || !outputEl.value) return;
-  navigator.clipboard.writeText(outputEl.value);
+  if (document.getElementById('outputEditorWrap').style.display === 'none') return;
+  const value = outputEditor.getValue();
+  if (!value) return;
+  navigator.clipboard.writeText(value);
   statusBadge.textContent = ' copied';
   setTimeout(() => statusBadge.textContent = '', 1200);
 };
 document.getElementById('downloadBtn').onclick = () => {
-  if (outputEl.style.display === 'none' || !outputEl.value) return;
+  if (document.getElementById('outputEditorWrap').style.display === 'none') return;
+  const value = outputEditor.getValue();
+  if (!value) return;
   if (!lastResult) lastResult = { metaName: 'robot' };
-  const blob = new Blob([outputEl.value], { type: 'application/xml' });
+  const blob = new Blob([value], { type: 'application/xml' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = lastResult.metaName.toLowerCase().replace(/\s+/g,'_') + '.rrcf';
