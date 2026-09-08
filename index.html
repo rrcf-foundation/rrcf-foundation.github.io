@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RRCF — Robot Remote Control Format</title>
+<meta name="description" content="RRCF is the open Operator Interface Declaration Standard for Physical AI — one .rrcf file, any robot, any operator, human or AI.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="container">
+    <div class="brand"><span class="dot">●</span> RRCF</div>
+    <nav class="links">
+      <a href="#what">What is RRCF</a>
+      <a href="#pillars">Pillars</a>
+      <a href="#categories">Categories</a>
+      <a href="#conformance">Conformance</a>
+      <a href="#tools">Tools</a>
+      <a href="https://github.com/rrcf-foundation/RRCF">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <span class="tag">RFC-STYLE DRAFT · v0.2 · APACHE 2.0</span>
+    <h1>The <span class="hl">Operator Interface</span><br>Standard for Physical AI</h1>
+    <p class="lead">
+      RRCF (Robot Remote Control Format) is an open, machine-readable file
+      format in which any robot declares its entire operator control
+      interface — so any web UI, fleet dashboard, or VLA model can control it
+      without per-robot integration code.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="spec/RRCF_v02_RFC_Specification.pdf">Read the Spec</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF">View on GitHub</a>
+      <a class="btn btn-secondary" href="tools/converter.html">URDF/MJCF/SDF → RRCF</a>
+    </div>
+    <div class="hero-img">
+      <img src="assets/images/RRCF_Robot_Remote_Control_Format_full.jpg" alt="RRCF — Robot Remote Control Format overview">
+    </div>
+  </div>
+</section>
+
+<section id="what">
+  <div class="container">
+    <div class="two-col">
+      <div>
+        <div class="eyebrow">Why RRCF exists</div>
+        <h2>Every robot has its own controller. That doesn't scale.</h2>
+        <p class="section-sub" style="margin-bottom:20px;">
+          Robot deployment is heading toward billions of units across every
+          morphology — nanorobots, agricultural swarms, industrial humanoids,
+          home assistants, aerial and marine vehicles. Every one needs a human,
+          or an AI acting on a human's behalf, in the loop: an operator, a
+          supervisor, or someone who can hit the e-stop.
+        </p>
+        <p class="section-sub">
+          Today every robot ships its own bespoke controller and its own
+          integration effort. RRCF is the missing <strong>operator layer</strong>
+          in the robotics standards stack — it doesn't replace URDF/MJCF/SDF
+          (physical description) or VDA 5050/Open-RMF (fleet mission
+          assignment), it completes the stack above them.
+        </p>
+      </div>
+      <div>
+        <table class="stack-table">
+          <thead><tr><th>Layer</th><th>Standards</th><th>Answers</th></tr></thead>
+          <tbody>
+            <tr><td>Physical</td><td>URDF, MJCF, SDF, USD</td><td>What is this robot made of?</td></tr>
+            <tr><td>Fleet</td><td>VDA 5050, Open-RMF</td><td>How are missions assigned?</td></tr>
+            <tr class="highlight"><td>Operator</td><td>RRCF</td><td>How does any operator control any robot?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pillars">
+  <div class="container">
+    <div class="eyebrow">The standard</div>
+    <h2>Five pillars</h2>
+    <p class="section-sub">RRCF spans control, fleet coordination, integration, safety, and choreography — all from one declared file.</p>
+    <div class="pillars">
+      <div class="pillar-card">
+        <div class="num">01</div>
+        <h3>Remote Control</h3>
+        <p>One unified operator UI for any robot, any morphology — rendered directly from the declaration, no per-robot code.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="num">02</div>
+        <h3>Fleet Management</h3>
+        <p>Complements VDA 5050 and Open-RMF rather than competing — RRCF sits above the mission-assignment layer.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="num">03</div>
+        <h3>Collection &amp; Integration</h3>
+        <p>The same wire format used for control doubles as the universal integration format for data pipelines, VLA training, and digital twins.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="num">04</div>
+        <h3>Safety</h3>
+        <p>E-stop, watchdog timeout, geofence, and speed limits standardized across every robot, every morphology.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="num">05</div>
+        <h3>Choreography</h3>
+        <p><code>.rrcm</code> mission files for synchronized multi-robot operations — GPS clock-synced, pre-computed trajectories.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="categories">
+  <div class="container">
+    <div class="eyebrow">Morphology taxonomy</div>
+    <h2>Twelve canonical categories</h2>
+    <p class="section-sub">Every robot declares exactly one primary category, with capabilities layered on as attachments (arms, grippers, sensors, tools).</p>
+    <div class="cat-grid">
+      <div class="cat-chip"><span class="id">wheeled</span><span class="label">Wheeled / Tracked</span><span class="ex">TurtleBot, Clearpath Husky</span></div>
+      <div class="cat-chip"><span class="id">legged</span><span class="label">Legged (Quad/Hex)</span><span class="ex">Unitree Go2, Spot, ANYmal</span></div>
+      <div class="cat-chip"><span class="id">loco_manip</span><span class="label">Loco-Manipulation</span><span class="ex">Spot+Arm, Go2+Z1</span></div>
+      <div class="cat-chip"><span class="id">wheeled_humanoid</span><span class="label">Wheeled Humanoid</span><span class="ex">Sanctuary Phoenix Gen8</span></div>
+      <div class="cat-chip"><span class="id">full_humanoid</span><span class="label">Full Humanoid</span><span class="ex">Unitree G1/H1, Figure 02, Optimus</span></div>
+      <div class="cat-chip"><span class="id">manipulator</span><span class="label">Fixed Manipulator</span><span class="ex">UR5/10, Franka</span></div>
+      <div class="cat-chip"><span class="id">aerial</span><span class="label">Aerial (Drone/VTOL)</span><span class="ex">DJI, ArduPilot, PX4</span></div>
+      <div class="cat-chip"><span class="id">marine_surface</span><span class="label">Marine Surface (USV)</span><span class="ex">WAM-V, ArduPilot Boat</span></div>
+      <div class="cat-chip"><span class="id">marine_sub</span><span class="label">Marine Underwater</span><span class="ex">BlueROV2, VideoRay ROV</span></div>
+      <div class="cat-chip"><span class="id">industrial_vehicle</span><span class="label">Industrial Vehicle</span><span class="ex">CAT excavator, Komatsu dozer</span></div>
+      <div class="cat-chip"><span class="id">agri_vehicle</span><span class="label">Agricultural Vehicle</span><span class="ex">John Deere autonomy, Naïo Oz</span></div>
+      <div class="cat-chip"><span class="id">custom</span><span class="label">Custom (vendor-defined)</span><span class="ex">Medical, nano, space, soft robot</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="example">
+  <div class="container">
+    <div class="eyebrow">The file format</div>
+    <h2>A minimal <code>.rrcf</code> declaration</h2>
+    <p class="section-sub">Morphology, skills, safety limits, and transport — all in one XML document that any compliant controller or VLA model can load at runtime.</p>
+    <pre class="code-block"><span class="cm">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="tag">&lt;rrcf</span> <span class="attr">version</span>=<span class="str">"1.0"</span> <span class="attr">xmlns</span>=<span class="str">"https://rrcf.io/schema/1.0"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;meta&gt;</span>
+    <span class="tag">&lt;name&gt;</span>Unitree Go2 + Z1 Arm<span class="tag">&lt;/name&gt;</span>
+    <span class="tag">&lt;vendor&gt;</span>Unitree Robotics<span class="tag">&lt;/vendor&gt;</span>
+    <span class="tag">&lt;physical_ref</span> <span class="attr">format</span>=<span class="str">"urdf"</span> <span class="attr">path</span>=<span class="str">"go2_z1.urdf"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;/meta&gt;</span>
+
+  <span class="tag">&lt;primary</span> <span class="attr">category</span>=<span class="str">"legged"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;locomotion</span> <span class="attr">axes</span>=<span class="str">"vx vy wz"</span> <span class="attr">max_vx</span>=<span class="str">"1.5"</span> <span class="attr">max_wz</span>=<span class="str">"2.0"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;modes&gt;</span>stand trot bound crawl prone<span class="tag">&lt;/modes&gt;</span>
+  <span class="tag">&lt;/primary&gt;</span>
+
+  <span class="tag">&lt;skills&gt;</span>
+    <span class="tag">&lt;skill</span> <span class="attr">id</span>=<span class="str">"sit"</span> <span class="attr">label</span>=<span class="str">"Sit"</span> <span class="attr">standard</span>=<span class="str">"true"</span> <span class="attr">cmd</span>=<span class="str">'{"mode":"sit"}'</span><span class="tag">/&gt;</span>
+    <span class="cm">&lt;!-- vendor-custom skill — VLA reads at runtime, no retraining --&gt;</span>
+    <span class="tag">&lt;skill</span> <span class="attr">id</span>=<span class="str">"heel_stretch"</span> <span class="attr">label</span>=<span class="str">"Yoga Pose"</span> <span class="attr">cmd</span>=<span class="str">'{"mode":"custom_01"}'</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;/skills&gt;</span>
+
+  <span class="tag">&lt;safety&gt;</span>
+    <span class="tag">&lt;estop</span> <span class="attr">required</span>=<span class="str">"true"</span> <span class="attr">topic</span>=<span class="str">"/rrcf/go2/estop"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;watchdog</span> <span class="attr">timeout_ms</span>=<span class="str">"500"</span> <span class="attr">action</span>=<span class="str">"halt"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;/safety&gt;</span>
+
+  <span class="tag">&lt;transport&gt;</span>
+    <span class="tag">&lt;endpoint</span> <span class="attr">role</span>=<span class="str">"operator_cmd"</span> <span class="attr">protocol</span>=<span class="str">"rrcf_mqtt"</span> <span class="attr">topic</span>=<span class="str">"/rrcf/go2/cmd"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;/transport&gt;</span>
+<span class="tag">&lt;/rrcf&gt;</span></pre>
+    <p style="margin-top:16px; font-size:13.5px; color:var(--dim);">
+      Full annotated example with HUD, all five input modalities, and custom controls: see
+      <a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v02_RFC_Specification.pdf">spec §7.1</a>.
+    </p>
+  </div>
+</section>
+
+<section id="vla">
+  <div class="container">
+    <div class="two-col">
+      <div>
+        <div class="eyebrow">VLA integration</div>
+        <h2>RAG for robots</h2>
+        <p class="section-sub" style="margin-bottom:16px;">
+          A <code>.rrcf</code> file is designed to be loaded as context by a
+          Vision-Language-Action model at session start — the same way a
+          document is retrieved for RAG.
+        </p>
+        <ul style="color:var(--dim); font-size:14.5px; line-height:1.9; padding-left:20px;">
+          <li>Declared skills extend the VLA's action vocabulary at runtime — no fine-tuning required.</li>
+          <li>Vendor-specific skills become available instantly, because the declaration <em>is</em> the context.</li>
+          <li>Generated commands are bounded by the declared safety limits.</li>
+        </ul>
+      </div>
+      <div>
+        <pre class="code-block"><span class="cm">// every input modality produces the same
+// normalized wire format command</span>
+{
+  <span class="attr">"rrcf"</span>: <span class="str">"1.0"</span>,
+  <span class="attr">"category"</span>: <span class="str">"legged"</span>,
+  <span class="attr">"lx"</span>: 0.75, <span class="attr">"ly"</span>: 0.0,
+  <span class="attr">"rx"</span>: -0.25, <span class="attr">"ry"</span>: 0.0,
+  <span class="attr">"mode"</span>: <span class="str">"trot"</span>,
+  <span class="attr">"skill"</span>: null,
+  <span class="attr">"estop"</span>: false,
+  <span class="attr">"input"</span>: <span class="str">"touch_web"</span>,
+  <span class="attr">"twist"</span>: {
+    <span class="attr">"linear"</span>:  {<span class="attr">"x"</span>:0.75,<span class="attr">"y"</span>:0.0,<span class="attr">"z"</span>:0.0},
+    <span class="attr">"angular"</span>: {<span class="attr">"x"</span>:0.0,<span class="attr">"y"</span>:0.0,<span class="attr">"z"</span>:-0.25}
+  },
+  <span class="attr">"ts"</span>: 1719000000000
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="conformance">
+  <div class="container">
+    <div class="eyebrow">Adopter requirements</div>
+    <h2>What it takes to interoperate</h2>
+    <p class="section-sub">
+      RRCF defines conformance separately for the robot and the controller —
+      "controller" meaning any operator surface: a human-facing web UI, a
+      fleet console, another robot issuing commands, or a VLA model. Meet
+      your side of the contract and you interoperate with every other
+      compliant implementation, without pairwise integration.
+    </p>
+    <div class="two-col">
+      <div class="pillar-card">
+        <div class="num">ROBOT</div>
+        <h3>RRCF-compliant robot MUST</h3>
+        <ul style="color:var(--dim); font-size:13.5px; line-height:1.85; padding-left:18px; margin:0;">
+          <li>Expose a valid <code>&lt;rrcf version="1.0"&gt;</code> block, standalone or embedded in its description file.</li>
+          <li>Accept RRCF wire-format JSON on at least one declared transport endpoint.</li>
+          <li>Halt <strong>all</strong> motion immediately on <code>estop:true</code> — no exceptions.</li>
+          <li>Halt if no valid command arrives within the declared watchdog timeout.</li>
+          <li>Publish telemetry on every declared field at ≥1 Hz.</li>
+          <li>Implement the e-stop in hardware, independent of the network link (spec §13).</li>
+        </ul>
+      </div>
+      <div class="pillar-card">
+        <div class="num">CONTROLLER</div>
+        <h3>RRCF-compliant controller MUST</h3>
+        <ul style="color:var(--dim); font-size:13.5px; line-height:1.85; padding-left:18px; margin:0;">
+          <li>Parse the <code>.rrcf</code> file standalone — no other description format required.</li>
+          <li>Render the core panel (joysticks, e-stop, speed, telemetry) for <strong>every</strong> category, without per-robot code.</li>
+          <li>Render category/skill/attachment-specific panels purely from the declaration.</li>
+          <li>Support <code>touch_web</code> as the baseline input modality.</li>
+          <li>Include an <code>estop</code> field and a <code>Twist</code> sub-object in <strong>every</strong> transmitted command.</li>
+          <li>Normalize all input axes to <code>[-1.0, 1.0]</code> in wire-format output.</li>
+          <li>Reject any command exceeding the robot's declared safety limits — applies equally to human input and VLA-generated commands.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="section-sub" style="margin-top:28px;">
+      This split is what makes the three operator types — a human on a
+      touchscreen, a fleet console commanding a robot on behalf of another
+      robot, and a VLA model generating skill calls — fungible from the
+      robot's point of view: all three speak the same wire format and are
+      held to the same safety-limit contract, so the robot never needs to
+      know which kind of operator it's talking to. Full requirements,
+      including transport security and rate-limiting: spec §11–§13.
+    </p>
+  </div>
+</section>
+
+<section id="tools">
+  <div class="container">
+    <div class="eyebrow">Get started</div>
+    <h2>Tools &amp; resources</h2>
+    <p class="section-sub">Generate a draft <code>.rrcf</code> from an existing robot description, or read the full specification.</p>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h3>URDF/MJCF/SDF → RRCF Converter</h3>
+        <p>Drag and drop a physical description file — get a draft <code>.rrcf</code> operator-interface declaration back. Runs entirely client-side, nothing is uploaded.</p>
+        <div class="fmt-row">
+          <span class="fmt-pill ok">MJCF</span>
+          <span class="fmt-pill ok">URDF</span>
+          <span class="fmt-pill ok">SDF</span>
+          <span class="fmt-pill">USD</span>
+          <span class="fmt-pill">xacro</span>
+        </div>
+        <a class="btn btn-primary" href="tools/converter.html">Open Converter</a>
+      </div>
+      <div class="tool-card">
+        <h3>Specification</h3>
+        <p>The full RFC-style spec — motivation, schema, wire format, conformance requirements, and governance roadmap.</p>
+        <a class="btn btn-secondary" href="spec/RRCF_v02_RFC_Specification.pdf">Read PDF</a>
+      </div>
+      <div class="tool-card">
+        <h3>Reference Implementation</h3>
+        <p>A working React operator console covering all nine base morphology registries, driven entirely from the category declaration.</p>
+        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation">View on GitHub</a>
+      </div>
+      <div class="tool-card">
+        <h3>Adoption Guide</h3>
+        <p>When do you need a physical description file, an RRCF, or both — and should you publish yours publicly?</p>
+        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/rrcf-adoption-guide.md">Read Guide</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="spec" style="border-bottom:none;">
+  <div class="container">
+    <div class="eyebrow">Governance</div>
+    <h2>Versioning &amp; roadmap</h2>
+    <table class="stack-table">
+      <thead><tr><th>Version</th><th>Planned additions</th></tr></thead>
+      <tbody>
+        <tr class="highlight"><td>RRCF-1.0</td><td>12 categories, all 5 pillars, 5 input modalities</td></tr>
+        <tr><td>RRCF-1.1</td><td>Voice modality refinements, gesture spec, XR training</td></tr>
+        <tr><td>RRCF-2.0</td><td>World-context block, benchmarking, RL reward hints, medical/surgical/soft-robot categories</td></tr>
+        <tr><td>RRCF-3.0</td><td>Neural interface, zero-G thruster primitive</td></tr>
+      </tbody>
+    </table>
+    <p class="section-sub" style="margin-top:24px;">
+      RRCF follows semantic versioning. Category proposals go through:
+      proposal → 60-day review → draft → three independent implementations →
+      ratification → publication. Published under Apache License 2.0.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div>© 2026 RRCF Foundation. Published under Apache License 2.0.</div>
+    <div class="footer-links">
+      <a href="https://github.com/rrcf-foundation/RRCF">GitHub</a>
+      <a href="spec/RRCF_v02_RFC_Specification.pdf">Specification</a>
+      <a href="tools/converter.html">Converter</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
