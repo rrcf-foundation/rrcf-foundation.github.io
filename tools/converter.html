@@ -54,7 +54,11 @@
   .badge.fmt{color:var(--accent);border-color:var(--accent);}
   .filelist{padding:0 16px 12px;color:var(--dim);font-size:11px;}
   .filelist code{color:var(--text);}
-  .empty{color:var(--dim);text-align:center;padding:40px;font-size:12px;}
+  .empty{color:var(--dim);text-align:center;padding:40px;font-size:12px;flex:1;display:flex;align-items:center;justify-content:center;}
+  .empty.error{color:var(--danger);}
+  textarea#output{outline:none;}
+  textarea#output:focus{background:#0a0e13;}
+  .badge.edited{color:#c792ea;border-color:#c792ea;}
 </style>
 </head>
 <body>
@@ -158,10 +162,12 @@
       </label>
     </div>
     <div class="badges" style="padding:10px 16px 0;" id="badges"></div>
-    <pre id="output"><div class="empty">Load a robot description file to generate a draft .rrcf</div></pre>
+    <div class="empty" id="outputEmpty">Load a robot description file to generate a draft .rrcf</div>
+    <textarea id="output" spellcheck="false" style="display:none;"></textarea>
     <div class="toolbar">
-      <span style="color:var(--dim);font-size:11px;">Draft only — see spec §11 before deploying</span>
+      <span style="color:var(--dim);font-size:11px;" id="editHint">Draft only — see spec §11 before deploying</span>
       <div style="display:flex;gap:8px;">
+        <button id="resetBtn" title="Discard edits, regenerate from source">Reset to draft</button>
         <button id="copyBtn">Copy</button>
         <button id="downloadBtn">Download .rrcf</button>
       </div>
@@ -539,15 +545,43 @@ function buildRrcf(info, category, metaName, vendor, sourceFilename, sourceForma
 // UI wiring
 // ============================================================
 let loadedFiles = {};
-let lastResult = null;
+let lastResult = null;   // { metaName } — the .rrcf text itself lives in the textarea, edits included
+let userEdited = false;  // true once the operator hand-edits the output textarea
 
 const dropEl = document.getElementById('drop');
 const fileInput = document.getElementById('fileInput');
 const filelistEl = document.getElementById('filelist');
 const srcText = document.getElementById('srcText');
 const outputEl = document.getElementById('output');
+const outputEmptyEl = document.getElementById('outputEmpty');
 const badgesEl = document.getElementById('badges');
 const statusBadge = document.getElementById('statusBadge');
+const editHintEl = document.getElementById('editHint');
+
+function showOutput(text) {
+  outputEmptyEl.style.display = 'none';
+  outputEl.style.display = 'block';
+  outputEl.value = text;
+}
+function showEmpty(message, isError) {
+  outputEl.style.display = 'none';
+  outputEmptyEl.style.display = 'flex';
+  outputEmptyEl.textContent = message;
+  outputEmptyEl.classList.toggle('error', !!isError);
+}
+
+// The output textarea is directly editable. Any manual edit is preserved —
+// regeneration from source/fields only happens on a new file drop or an
+// explicit "Reset to draft" click, never silently overwriting an edit.
+outputEl.addEventListener('input', () => {
+  userEdited = true;
+  editHintEl.textContent = 'Edited — "Reset to draft" discards changes and regenerates from source';
+  badgesEl.querySelectorAll('.badge.edited').forEach(b => b.remove());
+  const b = document.createElement('span');
+  b.className = 'badge edited';
+  b.textContent = 'edited';
+  badgesEl.appendChild(b);
+});
 
 document.getElementById('pickBtn').onclick = () => fileInput.click();
 ['dragenter','dragover'].forEach(ev => dropEl.addEventListener(ev, e => { e.preventDefault(); dropEl.classList.add('drag'); }));
@@ -594,9 +628,13 @@ srcText.addEventListener('input', () => {
 
 let lastMainName = null;
 
-function runConversion(mainName) {
+function runConversion(mainName, opts) {
+  opts = opts || {};
   lastMainName = mainName;
   if (!mainName || !loadedFiles[mainName]) return;
+  // Don't clobber manual edits when a name/vendor/category field changes —
+  // only regenerate over the top when explicitly forced (new file, reset).
+  if (userEdited && !opts.force) return;
   try {
     const parser = new DOMParser();
     let doc;
@@ -631,8 +669,10 @@ function runConversion(mainName) {
     const overrideCat = document.getElementById('fCategory').value;
 
     const rrcf = buildRrcf(info, category, metaName, vendor, mainName, fmt, overrideCat);
-    lastResult = { rrcf, metaName };
-    outputEl.textContent = rrcf;
+    lastResult = { metaName };
+    userEdited = false;
+    editHintEl.textContent = 'Draft only — see spec §11 before deploying · edit freely, then Copy or Download';
+    showOutput(rrcf);
 
     const usedCat = overrideCat || category;
     let badgeHtml = `<span class="badge fmt">${fmt}</span><span class="badge">${info.nu} actuators</span><span class="badge">${info.njnt} joints</span><span class="badge cat">category: ${usedCat}</span>`;
@@ -642,20 +682,27 @@ function runConversion(mainName) {
     badgesEl.innerHTML = badgeHtml;
     statusBadge.textContent = '';
   } catch (err) {
-    outputEl.innerHTML = `<div class="empty" style="color:var(--danger)">${esc(err.message)}</div>`;
+    showEmpty(err.message, true);
     badgesEl.innerHTML = '';
   }
 }
 
+document.getElementById('resetBtn').onclick = () => {
+  if (!lastMainName) return;
+  userEdited = false;
+  runConversion(lastMainName, { force: true });
+};
+
 document.getElementById('copyBtn').onclick = () => {
-  if (!lastResult) return;
-  navigator.clipboard.writeText(lastResult.rrcf);
+  if (outputEl.style.display === 'none' || !outputEl.value) return;
+  navigator.clipboard.writeText(outputEl.value);
   statusBadge.textContent = ' copied';
   setTimeout(() => statusBadge.textContent = '', 1200);
 };
 document.getElementById('downloadBtn').onclick = () => {
-  if (!lastResult) return;
-  const blob = new Blob([lastResult.rrcf], { type: 'application/xml' });
+  if (outputEl.style.display === 'none' || !outputEl.value) return;
+  if (!lastResult) lastResult = { metaName: 'robot' };
+  const blob = new Blob([outputEl.value], { type: 'application/xml' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = lastResult.metaName.toLowerCase().replace(/\s+/g,'_') + '.rrcf';
