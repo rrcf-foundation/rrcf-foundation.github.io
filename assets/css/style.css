@@ -106,6 +106,20 @@ nav.links .icon { width: 14px; height: 14px; }
   margin-bottom: 20px;
 }
 
+.hero-name {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.hero-name-full {
+  font-weight: 400;
+  color: var(--dim);
+  letter-spacing: normal;
+}
+
 .hero h1 {
   font-size: clamp(32px, 5vw, 52px);
   margin: 0 0 16px;

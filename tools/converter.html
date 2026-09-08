@@ -743,12 +743,12 @@ srcEditor.on('change', (instance, changeObj) => {
 document.getElementById('blankBtn').onclick = () => {
   const cat = document.getElementById('blankTemplate').value;
   if (!cat) return;
-  loadedFiles = {}; // no source file — the editor's "blank:<cat>" pseudo-name signals this to runConversion
+  loadedFiles = {}; // no source file — lastMainName becomes the 'blank' sentinel, category comes from fCategory
   srcEditor.setValue('');
-  filelistEl.innerHTML = `Blank template: <code>${cat}</code> (no source file — edit the output directly)`;
+  filelistEl.innerHTML = `Blank template (no source file — edit the output directly, or change the Category override below)`;
   document.getElementById('fCategory').value = cat;
   userEdited = false;
-  runConversion('blank:' + cat, { force: true });
+  runConversion('blank', { force: true });
 };
 
 function runConversion(mainName, opts) {
@@ -760,8 +760,13 @@ function runConversion(mainName, opts) {
   // template, or reset).
   if (userEdited && !opts.force) return;
 
-  if (mainName.startsWith('blank:')) {
-    const cat = mainName.slice('blank:'.length);
+  if (mainName === 'blank') {
+    // Category always read fresh from the dropdown (same pattern as the
+    // overrideCat read below for file-based conversion) so switching the
+    // dropdown after loading a blank template actually regenerates with
+    // the new category, instead of being stuck with whatever category was
+    // selected at the moment the template button was clicked.
+    const cat = document.getElementById('fCategory').value || 'custom';
     const info = blankInfoForCategory(cat);
     const nameField = document.getElementById('fName');
     nameField.placeholder = 'my_robot';
