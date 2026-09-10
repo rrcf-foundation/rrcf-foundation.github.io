@@ -1,0 +1,20 @@
+{
+  "registryVersion": "1.0",
+  "updatedAt": "2026-09-08T00:00:00Z",
+  "entries": [
+    {
+      "id": "org.rrcf.ros2.generic",
+      "displayName": "RRCF Generic ROS 2 Bridge",
+      "adapterVersion": "0.1.0",
+      "rrcfVersions": ["1.0"],
+      "categories": ["wheeled"],
+      "endpoint": "ROS 2 Humble/Jazzy",
+      "status": "experimental",
+      "distribution": {
+        "type": "source",
+        "url": "https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation/rrcf_ros2_bridge"
+      },
+      "manifest": "https://github.com/rrcf-foundation/RRCF/blob/main/registry/adapters/org.rrcf.ros2.generic.json"
+    }
+  ]
+}
