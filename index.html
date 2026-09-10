@@ -15,7 +15,8 @@
     <div class="brand"><span class="icon" data-icon="robot"></span> RRCF</div>
     <nav class="links">
       <a href="#what">What is RRCF</a>
-      <a href="#pillars">Pillars</a>
+      <a href="#rrca">RRCA</a>
+      <a href="registry/index.html">Registry</a>
       <a href="#categories">Categories</a>
       <a href="#telemetry">Telemetry</a>
       <a href="#conformance">Conformance</a>
@@ -34,14 +35,16 @@
     <p class="lead">
       RRCF (Robot Remote Control Format) is an open, machine-readable file
       format in which any robot declares its entire operator control
-      interface — so any web UI, fleet dashboard, or VLA model can control it
-      without per-robot integration code.
+      interface. Once an endpoint Adapter is published for a robot model,
+      SDK family, or simulator, any RRCF controller can use it without
+      model-specific controller integration code.
     </p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="spec/RRCF_v02_RFC_Specification.pdf"><span class="icon" data-icon="doc"></span>Read the Spec</a>
       <a class="btn btn-secondary" href="demo/index.html"><span class="icon" data-icon="play"></span>Live Controller Demo</a>
       <a class="btn btn-secondary" href="tools/converter.html"><span class="icon" data-icon="sync"></span>URDF/MJCF/SDF → RRCF</a>
-      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation/rrcf_ros2_bridge"><span class="icon" data-icon="cpu"></span>ROS 2 Bridge</a>
+      <a class="btn btn-secondary" href="registry/index.html"><span class="icon" data-icon="database"></span>Adapter Registry</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/rrca.md"><span class="icon" data-icon="cpu"></span>RRCA Architecture</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF"><span class="icon" data-icon="github"></span>View on GitHub</a>
     </div>
     <div class="hero-img">
@@ -85,6 +88,36 @@
   </div>
 </section>
 
+<section id="rrca">
+  <div class="container">
+    <div class="eyebrow"><span class="icon" data-icon="cpu"></span>Portable endpoint runtime</div>
+    <h2>RRCA, Adopters, and Adapters</h2>
+    <p class="section-sub">RRCF separates the public operator contract from the code required to speak each vendor SDK, simulator API, ROS stack, serial protocol, or cloud robot API.</p>
+    <div class="tool-grid">
+      <div class="tool-card"><h3>Adopter</h3><p>A vendor, integrator, simulator provider, platform, or project that implements RRCF.</p></div>
+      <div class="tool-card"><h3>Adapter</h3><p>Endpoint-specific bridge code mapping normalized controls, skills, and telemetry to the target SDK or API.</p></div>
+      <div class="tool-card"><h3><code>.rrcf.adptr</code></h3><p>A ZIP-compatible Adapter package installed in addition to the vendor SDK. It is separate from the XML <code>.rrcf</code> declaration.</p></div>
+      <div class="tool-card"><h3>RRCA</h3><p>The RRCF Robot Control Agent loads the declaration, selects a category module, verifies the Adapter, validates commands, and routes telemetry.</p></div>
+    </div>
+    <pre class="code-block architecture-flow">Controller / dashboard / VLA
+             | RRCF commands + telemetry
+             v
+RRCA core + category module
+             | RRCA Adapter contract
+             v
+vendor.robot.rrcf.adptr
+             | vendor SDK / simulator API / ROS / serial
+             v
+Robot or simulator</pre>
+    <p class="section-sub"><strong>Adapter once per model or SDK family; generic controllers thereafter.</strong> Calibration, homing, and simulator tuning remain inside vendor firmware, the SDK, or the Adapter. RRCA does not define or parse a calibration record.</p>
+    <div class="hero-actions" style="justify-content:flex-start;margin:0;">
+      <a class="btn btn-primary" href="registry/index.html">Browse Adapter Registry</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/rrca.md">Read RRCA architecture</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/adapter-package.md">Read package format</a>
+    </div>
+  </div>
+</section>
+
 <section id="pillars">
   <div class="container">
     <div class="eyebrow"><span class="icon" data-icon="shield"></span>The standard</div>
@@ -94,7 +127,7 @@
       <div class="pillar-card">
         <div class="num">01</div>
         <h3><span class="icon" data-icon="controller"></span>Remote Control</h3>
-        <p>One unified operator UI for any robot, any morphology — rendered directly from the declaration, no per-robot code. Covers both live control and <strong>replay</strong> of a recorded session through the same panel it was captured from, since both speak the identical wire format.</p>
+        <p>One unified operator UI for any robot, any morphology — rendered directly from the declaration. A model/SDK Adapter performs endpoint integration once, so controllers remain generic. Covers both live control and <strong>replay</strong> through the same declared interface.</p>
       </div>
       <div class="pillar-card">
         <div class="num">02</div>
@@ -288,13 +321,12 @@
     <div class="eyebrow"><span class="icon" data-icon="lock"></span>Adopter requirements</div>
     <h2>What it takes to interoperate</h2>
     <p class="section-sub">
-      RRCF defines conformance separately for the robot and the controller —
-      "controller" meaning any operator surface: a human-facing web UI, a
-      fleet console, another robot issuing commands, or a VLA model. Meet
-      your side of the contract and you interoperate with every other
-      compliant implementation, without pairwise integration.
+      RRCF conformance covers the controller, RRCA runtime, and endpoint
+      Adapter/robot boundaries. A human UI, fleet console, another robot, or
+      VLA model sends the same declared contract; endpoint integration is
+      implemented once in the compatible Adapter.
     </p>
-    <div class="two-col">
+    <div class="tool-grid">
       <div class="pillar-card">
         <div class="num">ROBOT</div>
         <h3><span class="icon" data-icon="robot"></span>RRCF-compliant robot MUST</h3>
@@ -318,6 +350,17 @@
           <li>Include an <code>estop</code> field and a <code>Twist</code> sub-object in <strong>every</strong> transmitted command.</li>
           <li>Normalize all input axes to <code>[-1.0, 1.0]</code> in wire-format output.</li>
           <li>Reject any command exceeding the robot's declared safety limits — applies equally to human input and VLA-generated commands.</li>
+        </ul>
+      </div>
+      <div class="pillar-card">
+        <div class="num">RRCA + ADAPTER</div>
+        <h3><span class="icon" data-icon="cpu"></span>Conforming deployment MUST</h3>
+        <ul style="color:var(--dim); font-size:13.5px; line-height:1.85; padding-left:18px; margin:0;">
+          <li>Load and validate the declaration before accepting commands.</li>
+          <li>Verify Adapter identity, compatibility, and package integrity.</li>
+          <li>Map required controls, skills, telemetry, and safe-state behavior.</li>
+          <li>Reject endpoint mismatches instead of silently claiming support.</li>
+          <li>Keep credentials and unit calibration outside public artifacts.</li>
         </ul>
       </div>
     </div>
@@ -373,8 +416,18 @@
       </div>
       <div class="tool-card">
         <h3><span class="icon" data-icon="book"></span>Adoption Guide</h3>
-        <p>When do you need a physical description file, an RRCF, or both — and should you publish yours publicly?</p>
+        <p>What Adopters publish: the `.rrcf` declaration, `.rrcf.adptr` package, SDK dependency, and private deployment configuration.</p>
         <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/rrcf-adoption-guide.md">Read Guide</a>
+      </div>
+      <div class="tool-card">
+        <h3><span class="icon" data-icon="database"></span>Adapter Registry</h3>
+        <p>Browse Foundation-reviewed Adapter compatibility and distribution metadata, or submit an Adapter for publication.</p>
+        <a class="btn btn-primary" href="registry/index.html">Open Registry</a>
+      </div>
+      <div class="tool-card">
+        <h3><span class="icon" data-icon="cpu"></span>RRCA Architecture</h3>
+        <p>Read the generic runtime, category-module, Adapter lifecycle, simulation, identity, and calibration boundaries.</p>
+        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/rrca.md">Read Architecture</a>
       </div>
     </div>
   </div>
@@ -408,6 +461,7 @@
       <a href="https://github.com/rrcf-foundation/RRCF"><span class="icon" data-icon="github"></span>GitHub</a>
       <a href="spec/RRCF_v02_RFC_Specification.pdf"><span class="icon" data-icon="doc"></span>Specification</a>
       <a href="tools/converter.html"><span class="icon" data-icon="sync"></span>Converter</a>
+      <a href="registry/index.html"><span class="icon" data-icon="database"></span>Adapter Registry</a>
       <a href="demo/index.html"><span class="icon" data-icon="play"></span>Live Demo</a>
     </div>
   </div>

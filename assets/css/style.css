@@ -379,3 +379,49 @@ footer .container {
 footer a { color: var(--dim); }
 footer a:hover { color: var(--accent); }
 .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+
+/* RRCA architecture and Adapter Registry */
+.architecture-flow {
+  max-width: 760px;
+  margin: 28px 0;
+}
+
+.registry-table td:first-child {
+  display: table-cell;
+  font-family: var(--sans);
+}
+
+.registry-table small {
+  color: var(--dim);
+}
+
+.status {
+  display: inline-block;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.status-experimental {
+  color: var(--accent2);
+  border-color: var(--accent2);
+}
+
+.guidance-list {
+  margin: 0;
+  padding-left: 22px;
+  color: var(--dim);
+  font-size: 14.5px;
+  line-height: 1.9;
+}
+
+@media (max-width: 960px) {
+  nav.links { gap: 12px; }
+  nav.links a:nth-child(n+6) { display: none; }
+}
+
+@media (max-width: 680px) {
+  .registry-table { display: block; overflow-x: auto; white-space: nowrap; }
+}
