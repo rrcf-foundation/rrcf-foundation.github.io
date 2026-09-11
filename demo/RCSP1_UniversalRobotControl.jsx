@@ -240,7 +240,6 @@ const RCSP_CATEGORIES = {
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap');
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:#060a0f;}
 
   .rcsp-root{
     min-height:100vh;

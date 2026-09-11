@@ -6,50 +6,46 @@
 <title>RRCF — Robot Remote Control Format</title>
 <meta name="description" content="RRCF is the open Operator Interface Declaration Standard for Physical AI — one .rrcf file, any robot, any operator, human or AI.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
-<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/theme.js?v=20260910-layout"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20260910-layout2">
 </head>
 <body>
 
 <header class="site-nav">
   <div class="container">
-    <div class="brand"><span class="icon" data-icon="robot"></span> RRCF</div>
-    <nav class="links">
-      <a href="#what">What is RRCF</a>
-      <a href="#rrca">RRCA</a>
-      <a href="registry/index.html">Registry</a>
-      <a href="#categories">Categories</a>
-      <a href="#telemetry">Telemetry</a>
-      <a href="#conformance">Conformance</a>
-      <a href="#tools">Tools</a>
-      <a href="demo/index.html"><span class="icon" data-icon="play"></span>Live Demo</a>
-      <a href="https://github.com/rrcf-foundation/RRCF"><span class="icon" data-icon="github"></span>GitHub</a>
-    </nav>
+    <a class="brand" href="index.html" aria-label="RRCF home"><span class="icon" data-icon="robot"></span><span>RRCF</span></a>
+    <div class="nav-actions">
+      <nav class="links" aria-label="Primary navigation">
+        <a class="nav-secondary" href="#what">Why RRCF</a>
+        <a class="nav-mobile" href="#rrca">Architecture</a>
+        <a class="nav-mobile" href="registry/index.html">Registry</a>
+        <a class="nav-secondary" href="#tools">Resources</a>
+      </nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span data-theme-icon aria-hidden="true">☾</span><span data-theme-label>Dark</span></button>
+    </div>
   </div>
 </header>
 
 <section class="hero">
-  <div class="container">
-    <span class="tag">RFC-STYLE DRAFT · v0.2 · APACHE 2.0</span>
-    <div class="hero-name">RRCF <span class="hero-name-full">(Robot Remote Control Format)</span></div>
-    <h1>The <span class="hl">Operator Interface</span><br>Standard for Physical AI</h1>
-    <p class="lead">
-      RRCF (Robot Remote Control Format) is an open, machine-readable file
-      format in which any robot declares its entire operator control
-      interface. Once an endpoint Adapter is published for a robot model,
-      SDK family, or simulator, any RRCF controller can use it without
-      model-specific controller integration code.
-    </p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="spec/RRCF_v02_RFC_Specification.pdf"><span class="icon" data-icon="doc"></span>Read the Spec</a>
-      <a class="btn btn-secondary" href="demo/index.html"><span class="icon" data-icon="play"></span>Live Controller Demo</a>
-      <a class="btn btn-secondary" href="tools/converter.html"><span class="icon" data-icon="sync"></span>URDF/MJCF/SDF → RRCF</a>
-      <a class="btn btn-secondary" href="registry/index.html"><span class="icon" data-icon="database"></span>Adapter Registry</a>
-      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/rrca.md"><span class="icon" data-icon="cpu"></span>RRCA Architecture</a>
-      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF"><span class="icon" data-icon="github"></span>View on GitHub</a>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="tag">RFC-STYLE DRAFT · v0.2 · APACHE 2.0</span>
+      <div class="hero-name">RRCF <span class="hero-name-full">Robot Remote Control Format</span></div>
+      <h1>The <span class="hl">operator interface</span> standard for Physical AI.</h1>
+      <p class="lead">An open, machine-readable format for declaring how a robot is controlled, monitored, and operated safely. Publish one endpoint Adapter; keep controllers generic.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="spec/RRCF_v02_RFC_Specification.pdf"><span class="icon" data-icon="doc"></span>Read the specification</a>
+        <a class="btn btn-secondary" href="registry/index.html"><span class="icon" data-icon="database"></span>Explore the Registry</a>
+      </div>
+      <div class="resource-links">
+        <a href="demo/index.html"><span class="icon" data-icon="play"></span>Live demo</a>
+        <a href="tools/converter.html"><span class="icon" data-icon="sync"></span>Converter</a>
+        <a href="https://github.com/rrcf-foundation/RRCF"><span class="icon" data-icon="github"></span>GitHub</a>
+      </div>
     </div>
-    <div class="hero-img">
-      <img src="assets/images/RRCF_Robot_Remote_Control_Format_full.jpg" alt="RRCF — Robot Remote Control Format overview">
-    </div>
+    <figure class="hero-img">
+      <img src="assets/images/RRCF_Robot_Remote_Control_Format_full.jpg" alt="RRCF operator interface standard overview">
+    </figure>
   </div>
 </section>
 

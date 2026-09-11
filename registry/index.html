@@ -6,45 +6,34 @@
 <title>RRCF Adapter Registry</title>
 <meta name="description" content="Foundation-governed Registry of RRCF endpoint Adapters for RRCA runtimes.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
-<link rel="stylesheet" href="../assets/css/style.css">
+<script src="../assets/js/theme.js?v=20260910-layout"></script>
+<link rel="stylesheet" href="../assets/css/style.css?v=20260910-layout2">
 </head>
 <body>
 <header class="site-nav">
   <div class="container">
-    <a class="brand" href="../index.html"><span class="icon" data-icon="robot"></span> RRCF</a>
-    <nav class="links">
-      <a href="../index.html#rrca">RRCA</a>
-      <a href="#catalog">Catalog</a>
-      <a href="#publish">Publish</a>
-      <a href="https://github.com/rrcf-foundation/RRCF/tree/main/registry"><span class="icon" data-icon="github"></span>Registry source</a>
-    </nav>
+    <a class="brand" href="../index.html" aria-label="RRCF home"><span class="icon" data-icon="robot"></span><span>RRCF</span></a>
+    <div class="nav-actions">
+      <nav class="links" aria-label="Registry navigation">
+        <a class="nav-secondary" href="../index.html#rrca">Architecture</a>
+        <a class="nav-mobile" href="#catalog">Catalog</a>
+        <a class="nav-secondary" href="#publish">Publish</a>
+        <a href="https://github.com/rrcf-foundation/RRCF/tree/main/registry"><span class="icon" data-icon="github"></span>Source</a>
+      </nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span data-theme-icon aria-hidden="true">☾</span><span data-theme-label>Dark</span></button>
+    </div>
   </div>
 </header>
 
-<section class="hero">
-  <div class="container">
+<section class="hero hero-compact">
+  <div class="container content-narrow">
     <span class="tag">FOUNDATION-GOVERNED · GIT-BACKED · REGISTRY 1.0</span>
     <div class="hero-name">RRCF Adapter Registry</div>
-    <h1>Discover the <span class="hl">Adapter</span><br>for each endpoint</h1>
-    <p class="lead">RRCA uses Registry metadata to find an Adapter compatible with a robot model, vendor SDK, ROS stack, simulator, platform, and RRCF version.</p>
+    <h1>Find the right <span class="hl">Adapter</span> for each endpoint.</h1>
+    <p class="lead">Discover compatibility metadata for robot models, vendor SDKs, ROS stacks, simulators, platforms, and RRCF versions.</p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="#catalog">Browse catalog</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/README.md">Publication guidance</a>
-      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/adapter-package.md"><code>.rrcf.adptr</code> format</a>
-    </div>
-  </div>
-</section>
-
-<section id="terms">
-  <div class="container">
-    <div class="eyebrow"><span class="icon" data-icon="layers"></span>Portable runtime architecture</div>
-    <h2>Adopter, Adapter, package, and Agent</h2>
-    <p class="section-sub">The terms identify different parts of the ecosystem and are not interchangeable.</p>
-    <div class="tool-grid">
-      <div class="tool-card"><h3>Adopter</h3><p>A vendor, integrator, simulator provider, platform, or project that implements RRCF.</p></div>
-      <div class="tool-card"><h3>Adapter</h3><p>Bridge code mapping normalized RRCF controls and telemetry to a vendor SDK, simulator API, ROS, serial protocol, or cloud robot API.</p></div>
-      <div class="tool-card"><h3><code>.rrcf.adptr</code></h3><p>A ZIP-compatible package containing the Adapter and manifest. It supplements the vendor SDK; it does not replace it.</p></div>
-      <div class="tool-card"><h3>RRCA</h3><p>The RRCF Robot Control Agent: the generic runtime that loads declarations, verifies Adapters, validates commands, and routes telemetry.</p></div>
     </div>
   </div>
 </section>
@@ -53,69 +42,82 @@
   <div class="container">
     <div class="eyebrow"><span class="icon" data-icon="database"></span>Registry catalog</div>
     <h2>Published Adapter entries</h2>
-    <p class="section-sub">The catalog starts with source references while the packaged RRCA contract matures. Only package entries with immutable digest metadata are installable by RRCA.</p>
-    <table class="stack-table registry-table">
-      <thead><tr><th>Adapter</th><th>Endpoint</th><th>Category</th><th>Version</th><th>Status</th><th>Distribution</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><code>org.rrcf.ros2.generic</code><br><small>RRCF Generic ROS 2 Bridge</small></td>
-          <td>ROS 2 Humble/Jazzy</td>
-          <td>wheeled</td>
-          <td>0.1.0</td>
-          <td><span class="status status-experimental">experimental</span></td>
-          <td><a href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation/rrcf_ros2_bridge">source reference</a></td>
-        </tr>
-      </tbody>
-    </table>
-    <p style="margin-top:18px;color:var(--dim);font-size:13.5px;">Machine-readable catalog: <a href="catalog.json"><code>registry/catalog.json</code></a>. Authoritative reviewed entries live in the <a href="https://github.com/rrcf-foundation/RRCF/tree/main/registry">Foundation repository</a>.</p>
+    <p class="section-sub">The catalog starts with reviewed source references. Only package entries with immutable digest metadata are installable by RRCA.</p>
+    <div class="table-wrap">
+      <table class="stack-table registry-table">
+        <thead><tr><th>Adapter</th><th>Endpoint</th><th>Category</th><th>Version</th><th>Status</th><th>Distribution</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>org.rrcf.ros2.generic</code><br><small>RRCF Generic ROS 2 Bridge</small></td>
+            <td>ROS 2 Humble/Jazzy</td>
+            <td>wheeled</td>
+            <td>0.1.0</td>
+            <td><span class="status status-experimental">experimental</span></td>
+            <td><a href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation/rrcf_ros2_bridge">source reference</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="inline-note">Machine-readable catalog: <a href="catalog.json"><code>registry/catalog.json</code></a>. Authoritative entries live in the <a href="https://github.com/rrcf-foundation/RRCF/tree/main/registry">Foundation repository</a>.</p>
+  </div>
+</section>
+
+<section id="terms">
+  <div class="container">
+    <div class="eyebrow"><span class="icon" data-icon="layers"></span>Portable runtime architecture</div>
+    <h2>Adopter, Adapter, package, and Agent</h2>
+    <p class="section-sub">Each term identifies a separate part of the ecosystem.</p>
+    <div class="tool-grid">
+      <div class="tool-card"><h3>Adopter</h3><p>A vendor, integrator, simulator provider, platform, or project that implements RRCF.</p></div>
+      <div class="tool-card"><h3>Adapter</h3><p>Bridge code mapping normalized RRCF controls and telemetry to an SDK, simulator API, ROS, serial protocol, or cloud API.</p></div>
+      <div class="tool-card"><h3><code>.rrcf.adptr</code></h3><p>A ZIP-compatible package containing the Adapter and manifest. It supplements the vendor SDK.</p></div>
+      <div class="tool-card"><h3>RRCA</h3><p>The generic Agent that loads declarations, verifies Adapters, validates commands, and routes telemetry.</p></div>
+    </div>
   </div>
 </section>
 
 <section id="flow">
   <div class="container">
-    <div class="eyebrow"><span class="icon" data-icon="sync"></span>Discovery</div>
-    <h2>How RRCA selects an Adapter</h2>
-    <pre class="code-block">robot.rrcf + deployment identity
+    <div class="two-col">
+      <div>
+        <div class="eyebrow"><span class="icon" data-icon="sync"></span>Discovery</div>
+        <h2>How RRCA selects an Adapter</h2>
+        <p class="section-sub">Registry matching narrows candidates; the Adapter must still probe the target and reject declaration or capability mismatches before actuation.</p>
+      </div>
+      <pre class="code-block">robot.rrcf + deployment identity
             |
             v
-RRCA queries configured Registry
+query configured Registry
             |
-            | match category, vendor/model, RRCF,
-            | endpoint SDK/API version and target platform
-            | plus RRCA version for installable packages
-            v
-verify manifest + package SHA-256 + trust policy
+match model, RRCF, SDK/API, platform
+and RRCA version for packages
             |
-            v
-Adapter probe -> initialize -> activate
+verify manifest + SHA-256 + trust policy
             |
-            v
-vendor SDK / simulator API / ROS / serial -> target</pre>
-    <p class="section-sub">Registry matching is not a safety certificate for a physical unit. The Adapter still probes the target and must reject declaration or capability mismatches before actuation.</p>
+probe -> initialize -> activate</pre>
+    </div>
   </div>
 </section>
 
-<section id="publish">
+<section id="publish" class="section-last">
   <div class="container">
     <div class="eyebrow"><span class="icon" data-icon="doc"></span>For Adopters</div>
     <h2>Publish an Adapter</h2>
     <div class="two-col">
-      <div>
-        <ol class="guidance-list">
-          <li>Publish and version the model's XML <code>.rrcf</code> declaration.</li>
-          <li>Implement one Adapter for the model or SDK family.</li>
-          <li>Package it as <code>&lt;publisher&gt;.&lt;vendor&gt;.&lt;model&gt;.&lt;version&gt;.rrcf.adptr</code>.</li>
-          <li>Declare RRCF, RRCA, SDK/API, model, applicable endpoint firmware, category, platform, and capability compatibility.</li>
-          <li>Submit a Registry pull request with license, provenance, package digest, and conformance evidence.</li>
-        </ol>
-      </div>
+      <ol class="guidance-list">
+        <li>Publish and version the model's XML <code>.rrcf</code> declaration.</li>
+        <li>Implement one Adapter for the model or SDK family.</li>
+        <li>Package it as <code>&lt;publisher&gt;.&lt;vendor&gt;.&lt;model&gt;.&lt;version&gt;.rrcf.adptr</code>.</li>
+        <li>Declare compatibility for RRCF, RRCA, SDK/API, model, platform, capabilities, and applicable firmware.</li>
+        <li>Submit a Registry pull request with license, provenance, digest, and conformance evidence.</li>
+      </ol>
       <div class="pillar-card">
         <div class="num">BOUNDARY</div>
         <h3>Calibration remains endpoint-specific</h3>
-        <p>Vendor firmware, SDK code, or the Adapter owns calibration, homing, simulator gains, and tuning. RRCA does not parse a standardized calibration record. Registry metadata only declares which layer owns initialization.</p>
+        <p>Vendor firmware, SDK code, or the Adapter owns calibration, homing, simulator gains, and tuning. RRCA does not parse a standardized calibration record.</p>
       </div>
     </div>
-    <div class="hero-actions" style="justify-content:flex-start;margin:28px 0 0;">
+    <div class="section-actions">
       <a class="btn btn-primary" href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/README.md">Read Registry guidance</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/schema/adapter-manifest.schema.json">Manifest schema</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/issues/new">Propose an Adapter</a>
@@ -125,7 +127,7 @@ vendor SDK / simulator API / ROS / serial -> target</pre>
 
 <footer>
   <div class="container">
-    <div>© 2026 RRCF Foundation. Published under Apache License 2.0.</div>
+    <div>© 2026 RRCF Foundation. Apache License 2.0.</div>
     <div class="footer-links"><a href="../index.html">RRCF home</a><a href="https://github.com/rrcf-foundation/RRCF/tree/main/registry">Registry source</a></div>
   </div>
 </footer>
