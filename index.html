@@ -6,8 +6,8 @@
 <title>RRCF — Robot Remote Control Format</title>
 <meta name="description" content="RRCF is the open Operator Interface Declaration Standard for Physical AI — one .rrcf file, any robot, any operator, human or AI.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
-<script src="assets/js/theme.js?v=20260910-layout"></script>
-<link rel="stylesheet" href="assets/css/style.css?v=20260910-layout2">
+<script src="assets/js/theme.js?v=20260911-contract"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20260911-contract">
 </head>
 <body>
 
@@ -154,6 +154,14 @@ Robot or simulator</pre>
     <div class="eyebrow"><span class="icon" data-icon="custom"></span>Morphology taxonomy</div>
     <h2>Twelve canonical categories</h2>
     <p class="section-sub">Every robot declares exactly one primary category, with capabilities layered on as attachments (arms, grippers, sensors, tools).</p>
+    <p class="inline-note" style="margin:0 0 24px;">
+      A category is not just a label — it decides which control axes and which
+      telemetry fields the robot is <strong>required</strong> to declare. An
+      aerial vehicle owes <code>altitude</code> and <code>rssi</code>; a fixed
+      manipulator owes neither a locomotion axis nor a battery reading. The
+      matrix is machine-readable and
+      <a href="https://github.com/rrcf-foundation/RRCF/blob/main/conformance/profiles/category-profiles.json">checked, not just documented</a>.
+    </p>
     <div class="cat-grid">
       <div class="cat-chip"><span class="icon" data-icon="wheeled"></span><span><span class="id">wheeled</span><span class="label">Wheeled / Tracked</span><span class="ex">TurtleBot, Clearpath Husky</span></span></div>
       <div class="cat-chip"><span class="icon" data-icon="legged"></span><span><span class="id">legged</span><span class="label">Legged (Quad/Hex)</span><span class="ex">Unitree Go2, Spot, ANYmal</span></span></div>
@@ -195,6 +203,17 @@ Robot or simulator</pre>
     <span class="tag">&lt;skill</span> <span class="attr">id</span>=<span class="str">"heel_stretch"</span> <span class="attr">label</span>=<span class="str">"Yoga Pose"</span> <span class="attr">cmd</span>=<span class="str">'{"mode":"custom_01"}'</span><span class="tag">/&gt;</span>
   <span class="tag">&lt;/skills&gt;</span>
 
+  <span class="cm">&lt;!-- every field carries its own type, unit and range,
+       so a controller can render it with no prior knowledge --&gt;</span>
+  <span class="tag">&lt;telemetry&gt;</span>
+    <span class="tag">&lt;field</span> <span class="attr">id</span>=<span class="str">"estop_state"</span> <span class="attr">type</span>=<span class="str">"boolean"</span> <span class="attr">widget</span>=<span class="str">"indicator"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;field</span> <span class="attr">id</span>=<span class="str">"health"</span> <span class="attr">type</span>=<span class="str">"enum"</span>
+           <span class="attr">values</span>=<span class="str">"ready degraded rejected fault estop disconnected"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;field</span> <span class="attr">id</span>=<span class="str">"battery"</span> <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">unit</span>=<span class="str">"%"</span> <span class="attr">min</span>=<span class="str">"0"</span> <span class="attr">max</span>=<span class="str">"100"</span> <span class="attr">warn_below</span>=<span class="str">"20"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;field</span> <span class="attr">id</span>=<span class="str">"speed"</span> <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">unit</span>=<span class="str">"m/s"</span> <span class="attr">min</span>=<span class="str">"0"</span> <span class="attr">max</span>=<span class="str">"1.5"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;field</span> <span class="attr">id</span>=<span class="str">"temp"</span> <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">unit</span>=<span class="str">"degC"</span> <span class="attr">min</span>=<span class="str">"-20"</span> <span class="attr">max</span>=<span class="str">"100"</span> <span class="attr">warn_above</span>=<span class="str">"55"</span><span class="tag">/&gt;</span>
+  <span class="tag">&lt;/telemetry&gt;</span>
+
   <span class="tag">&lt;safety&gt;</span>
     <span class="tag">&lt;estop</span> <span class="attr">required</span>=<span class="str">"true"</span> <span class="attr">topic</span>=<span class="str">"/rrcf/go2/estop"</span><span class="tag">/&gt;</span>
     <span class="tag">&lt;watchdog</span> <span class="attr">timeout_ms</span>=<span class="str">"500"</span> <span class="attr">action</span>=<span class="str">"halt"</span><span class="tag">/&gt;</span>
@@ -202,6 +221,7 @@ Robot or simulator</pre>
 
   <span class="tag">&lt;transport&gt;</span>
     <span class="tag">&lt;endpoint</span> <span class="attr">role</span>=<span class="str">"operator_cmd"</span> <span class="attr">protocol</span>=<span class="str">"rrcf_mqtt"</span> <span class="attr">topic</span>=<span class="str">"/rrcf/go2/cmd"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;endpoint</span> <span class="attr">role</span>=<span class="str">"telemetry"</span> <span class="attr">protocol</span>=<span class="str">"mqtt"</span> <span class="attr">topic</span>=<span class="str">"/rrcf/go2/state"</span> <span class="attr">frequency_hz</span>=<span class="str">"10"</span><span class="tag">/&gt;</span>
   <span class="tag">&lt;/transport&gt;</span>
 <span class="tag">&lt;/rrcf&gt;</span></pre>
     <p style="margin-top:16px; font-size:13.5px; color:var(--dim);">
@@ -226,6 +246,7 @@ Robot or simulator</pre>
           <li>Declared skills extend the VLA's action vocabulary at runtime — no fine-tuning required.</li>
           <li>Vendor-specific skills become available instantly, because the declaration <em>is</em> the context.</li>
           <li>Generated commands are bounded by the declared safety limits.</li>
+          <li>The model reads observations the same way a dashboard does: every telemetry field arrives with its declared type, unit, and range, so <code>battery: 18</code> is unambiguously 18% and 2 below the warning threshold — not a number needing a vendor lookup.</li>
         </ul>
       </div>
       <div>
@@ -253,29 +274,69 @@ Robot or simulator</pre>
 
 <section id="telemetry">
   <div class="container">
-    <div class="eyebrow"><span class="icon" data-icon="chart"></span>Not just control</div>
-    <h2>Also a standard for dashboards and time-series data</h2>
+    <div class="eyebrow"><span class="icon" data-icon="chart"></span>Command needs state</div>
+    <h2>Nobody drives a car looking only at the road</h2>
     <p class="section-sub">
-      One consistent field schema — <code>lx/ly/rx/ry</code>, <code>estop</code>,
-      <code>twist</code>, <code>mode</code>, <code>skill</code>, <code>ts</code>,
-      plus whatever's declared under <code>&lt;telemetry&gt;</code> — across every
-      robot and every morphology category. That makes RRCF a telemetry and
-      time-series standard for free, with no separate schema to design.
+      You watch the speedometer, the fuel gauge, the temperature light. Take the
+      dashboard out and you don't have a car that drives slightly worse — you have
+      a car nobody should be driving, because the driver can no longer tell whether
+      the last input did what they intended.
     </p>
-    <div class="tool-grid">
-      <div class="tool-card">
-        <h3><span class="icon" data-icon="controller"></span>Dashboards</h3>
-        <p>A fleet dashboard built against the RRCF schema renders the same battery/speed/temp/custom-field widgets for a wheeled robot, a drone, and a humanoid — no per-robot dashboard config.</p>
+    <div class="two-col">
+      <div>
+        <p style="margin:0 0 14px; font-size:15px;">
+          Commanding a robot is the same. <code>estop:true</code> is not a stop —
+          it is a <em>request</em> to stop. Only <code>estop_state</code> coming
+          back tells the operator the robot actually stopped. A command stream
+          without a state stream is open-loop, and open-loop teleoperation of a
+          physical machine isn't a reduced feature set. It's an unsafe one.
+        </p>
+        <p style="margin:0 0 16px; font-size:15px;">
+          So telemetry isn't a bonus that falls out of the control format. It is
+          the other half of the same contract, declared in the same file — and a
+          declaration that omits a <code>telemetry</code> endpoint is
+          <strong>rejected</strong>:
+        </p>
+        <pre class="code-block"><span class="cm">$ rrcf-conformance lint no-telemetry-endpoint.rrcf</span>
+FAIL  no-telemetry-endpoint.rrcf
+      <span class="attr">ERROR</span> schema [transport/endpoints]:
+      A declaration with no telemetry endpoint is not
+      safely commandable: an operator cannot be asked
+      to command a robot whose current state they
+      cannot see.</pre>
       </div>
-      <div class="tool-card">
-        <h3><span class="icon" data-icon="database"></span>Time-series stores</h3>
-        <p>Writing RRCF telemetry into InfluxDB, TimescaleDB, or Prometheus gives one consistent measurement schema across your fleet, not one per vendor. Queries and alerts are written once.</p>
-      </div>
-      <div class="tool-card">
-        <h3><span class="icon" data-icon="network"></span>Data streams</h3>
-        <p>The same <code>operator_cmd</code>/<code>telemetry</code> MQTT or WebSocket endpoints declared under <code>&lt;transport&gt;</code> work as a generic pub/sub stream for any consumer, not only the control loop.</p>
+      <div>
+        <div class="pillar-card">
+          <div class="num">SELF-DESCRIPTION CONTRACT<span class="icon" data-icon="doc"></span></div>
+          <h3>A gauge is only useful if it's labelled</h3>
+          <p style="margin-bottom:14px;">
+            A speedometer works because the numbers mean km/h and the redline is
+            marked — you don't need a manual. RRCF requires the same of every
+            declared field: its own type, unit, and range.
+          </p>
+          <pre class="code-block" style="margin:0 0 14px;"><span class="tag">&lt;field</span> <span class="attr">id</span>=<span class="str">"battery"</span> <span class="attr">type</span>=<span class="str">"number"</span> <span class="attr">unit</span>=<span class="str">"%"</span>
+       <span class="attr">min</span>=<span class="str">"0"</span> <span class="attr">max</span>=<span class="str">"100"</span> <span class="attr">warn_below</span>=<span class="str">"20"</span>
+       <span class="attr">label</span>=<span class="str">"Battery"</span> <span class="attr">widget</span>=<span class="str">"gauge"</span><span class="tag">/&gt;</span></pre>
+          <p style="margin:0;">
+            A controller that has never heard of this robot can now draw the gauge,
+            scale it correctly, and turn it amber at 20%. The moment a consumer has
+            to know that <em>this</em> vendor's <code>soc</code> means battery
+            percent, the operator layer has stopped being portable — and RRCF has
+            no reason to exist.
+          </p>
+        </div>
       </div>
     </div>
+    <p class="inline-note">
+      Because command and state share one declared, self-describing schema, the
+      things normally built per-vendor become build-once: fleet dashboards that
+      render any morphology without per-robot config, one measurement schema in
+      InfluxDB / TimescaleDB / Prometheus instead of one per vendor, generic
+      pub/sub consumers on the declared <code>&lt;transport&gt;</code> endpoints,
+      and imitation-learning trajectories that are already
+      <code>(state, action)</code> pairs — because the state half was mandatory
+      all along.
+    </p>
   </div>
 </section>
 
@@ -293,9 +354,9 @@ Robot or simulator</pre>
     <div class="two-col">
       <div>
         <ul style="color:var(--dim); font-size:14.5px; line-height:1.9; padding-left:20px; margin:0;">
-          <li><strong style="color:var(--text);">Foxglove's generic Plot, Raw, and 3D panels render straight off the RRCF schema.</strong> Today a layout is hand-built per robot because every vendor's fields differ — a battery field might be <code>battery_pct</code>, <code>batt</code>, or <code>soc</code>. With RRCF it's always <code>battery</code>, always <code>lx/ly/rx/ry</code>, regardless of vendor or category.</li>
-          <li><strong style="color:var(--text);">One layout template works for any RRCF-compliant robot</strong> — wheeled, drone, or humanoid, unmodified.</li>
-          <li><strong style="color:var(--text);">Recordings become directly comparable across robots and vendors</strong>, since the recorded fields mean the same thing everywhere.</li>
+          <li><strong style="color:var(--text);">One Foxglove layout, any robot.</strong> Build a layout once against the RRCF wire format and it works unmodified for a wheeled robot, a drone, or a humanoid — the generic Plot, Raw, and 3D panels read the declared units and ranges rather than needing a hand-built config per vendor.</li>
+          <li><strong style="color:var(--text);">Recordings are comparable across robots and vendors.</strong> A <code>sit</code> skill call or an <code>estop:true</code> event looks identical in the file whether it came from a Go2 or a Franka arm, so two fleets' logs can be diffed instead of translated.</li>
+          <li><strong style="color:var(--text);">A recorded session doubles as a conformance artifact.</strong> The same capture you opened in Foxglove is valid input to <code>rrcf-conformance check-session</code> — which is how a vendor proves the robot honours its declaration, not just that the file parses.</li>
         </ul>
       </div>
       <div>
@@ -304,9 +365,12 @@ Robot or simulator</pre>
 
 <span class="attr">ros2</span> bag record /rrcf/go2/cmd /rrcf/go2/state
 
-<span class="cm"># open the resulting MCAP in Foxglove — the same
-# layout works for /rrcf/drone_01/state,
-# /rrcf/franka_arm/state, any RRCF-compliant robot</span></pre>
+<span class="cm"># open the result in Foxglove — the same layout
+# works for /rrcf/drone_01/state, /rrcf/franka_arm/state,
+# any RRCF-compliant robot</span>
+
+<span class="cm"># and check the robot against its own declaration</span>
+<span class="attr">rrcf-conformance</span> check-session go2.rrcf session.jsonl</pre>
       </div>
     </div>
   </div>
@@ -331,7 +395,9 @@ Robot or simulator</pre>
           <li>Accept RRCF wire-format JSON on at least one declared transport endpoint.</li>
           <li>Halt <strong>all</strong> motion immediately on <code>estop:true</code> — no exceptions.</li>
           <li>Halt if no valid command arrives within the declared watchdog timeout.</li>
-          <li>Publish telemetry on every declared field at ≥1 Hz.</li>
+          <li>Declare every telemetry field its <strong>category</strong> requires, and publish every declared field at ≥1 Hz.</li>
+          <li>Self-describe every field — type, unit, range — so a controller that has never seen the model can render it.</li>
+          <li>Publish <code>estop_state</code> and <code>health</code>, so an operator sees the robot's real state and not just their own last command.</li>
           <li>Implement the e-stop in hardware, independent of the network link (spec §13).</li>
         </ul>
       </div>
@@ -343,7 +409,7 @@ Robot or simulator</pre>
           <li>Render the core panel (joysticks, e-stop, speed, telemetry) for <strong>every</strong> category, without per-robot code.</li>
           <li>Render category/skill/attachment-specific panels purely from the declaration.</li>
           <li>Support <code>touch_web</code> as the baseline input modality.</li>
-          <li>Include an <code>estop</code> field and a <code>Twist</code> sub-object in <strong>every</strong> transmitted command.</li>
+          <li>Include <code>rrcf</code>, <code>category</code>, <code>type</code>, <code>estop</code>, and <code>ts</code> in <strong>every</strong> transmitted command — plus a <code>Twist</code> sub-object whenever the category declares locomotion axes (a bolted-down arm has no mobile base, so it isn't held to that rule).</li>
           <li>Normalize all input axes to <code>[-1.0, 1.0]</code> in wire-format output.</li>
           <li>Reject any command exceeding the robot's declared safety limits — applies equally to human input and VLA-generated commands.</li>
         </ul>
@@ -369,6 +435,52 @@ Robot or simulator</pre>
       know which kind of operator it's talking to. Full requirements,
       including transport security and rate-limiting: spec §11–§13.
     </p>
+
+    <div class="eyebrow" style="margin-top:40px;"><span class="icon" data-icon="shield"></span>Enforcement</div>
+    <h2>How &ldquo;MUST&rdquo; becomes more than a word</h2>
+    <p class="section-sub">
+      A requirement in a specification is unenforceable on its own. RRCF
+      enforcement has three layers, and they check genuinely different things —
+      which is why none of them replaces the others.
+    </p>
+    <div class="table-wrap">
+      <table class="stack-table">
+        <thead><tr><th>Layer</th><th>What it checks</th><th>How</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="icon" data-icon="doc"></span>1 · Declaration</td>
+            <td>The <code>.rrcf</code> declares everything its category requires, and every declared field self-describes</td>
+            <td><code>rrcf-conformance lint</code></td>
+          </tr>
+          <tr>
+            <td><span class="icon" data-icon="record"></span>2 · Runtime</td>
+            <td>The robot <em>actually publishes</em> what it declared, at the declared rate, inside the declared range</td>
+            <td><code>rrcf-conformance check-session</code></td>
+          </tr>
+          <tr>
+            <td><span class="icon" data-icon="flag"></span>3 · Certification</td>
+            <td>The right to claim RRCF compliance in the market</td>
+            <td>Foundation review — <strong>not yet operational</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="section-sub" style="margin-top:24px;">
+      Layer 1 cannot tell a robot that publishes <code>estop_state</code> from
+      one that merely promises to — that is exactly what layer 2 is for. And
+      neither layer stops a vendor who simply never runs them; that gap closes
+      only at layer 3, the same way USB-IF and the Wi-Fi Alliance close it, by
+      controlling the compliance mark rather than the code. Being straight about
+      it: layer 3 does not exist yet, so RRCF conformance today is
+      self-asserted, and the Registry marks entries
+      <span class="status status-experimental">experimental</span> until they
+      publish evidence from layer 2.
+    </p>
+    <div class="section-actions">
+      <a class="btn btn-primary" href="https://github.com/rrcf-foundation/RRCF/tree/main/conformance"><span class="icon" data-icon="shield"></span>Conformance tooling</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/conformance/profiles/category-profiles.json">Per-category field matrix</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/conformance/schema/rrcf-declaration.schema.json">Declaration schema</a>
+    </div>
   </div>
 </section>
 
@@ -392,7 +504,7 @@ Robot or simulator</pre>
       </div>
       <div class="tool-card">
         <h3><span class="icon" data-icon="play"></span>Live Controller Demo</h3>
-        <p>Run the controller-side reference implementation directly in your browser — switch between all nine base morphology categories, no install.</p>
+        <p>Run the controller-side reference implementation directly in your browser — switch between nine of the twelve categories, no install.</p>
         <a class="btn btn-primary" href="demo/index.html">Open Demo</a>
       </div>
       <div class="tool-card">
@@ -402,7 +514,7 @@ Robot or simulator</pre>
       </div>
       <div class="tool-card">
         <h3><span class="icon" data-icon="controller"></span>Controller Reference (React)</h3>
-        <p>A working React operator console covering all nine base morphology registries, driven entirely from the category declaration.</p>
+        <p>A working React operator console driven entirely from the category declaration. Covers nine of the twelve categories — <code>industrial_vehicle</code>, <code>agri_vehicle</code>, and <code>custom</code> are specified but not yet implemented here.</p>
         <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation">View on GitHub</a>
       </div>
       <div class="tool-card">
@@ -416,14 +528,14 @@ Robot or simulator</pre>
         <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/rrcf-adoption-guide.md">Read Guide</a>
       </div>
       <div class="tool-card">
-        <h3><span class="icon" data-icon="database"></span>Adapter Registry</h3>
-        <p>Browse Foundation-reviewed Adapter compatibility and distribution metadata, or submit an Adapter for publication.</p>
-        <a class="btn btn-primary" href="registry/index.html">Open Registry</a>
-      </div>
-      <div class="tool-card">
-        <h3><span class="icon" data-icon="cpu"></span>RRCA Architecture</h3>
-        <p>Read the generic runtime, category-module, Adapter lifecycle, simulation, identity, and calibration boundaries.</p>
-        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/rrca.md">Read Architecture</a>
+        <h3><span class="icon" data-icon="shield"></span>Conformance CLI</h3>
+        <p>Check a declaration against its category profile and the self-description contract, then check a recorded session against the declaration. Exit codes suit CI directly.</p>
+        <div class="fmt-row">
+          <span class="fmt-pill ok">lint</span>
+          <span class="fmt-pill ok">check-session</span>
+          <span class="fmt-pill ok">profiles</span>
+        </div>
+        <a class="btn btn-primary" href="https://github.com/rrcf-foundation/RRCF/tree/main/conformance">Open Conformance</a>
       </div>
     </div>
   </div>

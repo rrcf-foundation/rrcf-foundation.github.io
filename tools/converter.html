@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>URDF/MJCF/SDF → RRCF Converter</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
-<script src="../assets/js/theme.js?v=20260910-layout"></script>
+<script src="../assets/js/theme.js?v=20260911-contract"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <style>
@@ -134,6 +134,7 @@
       <li><strong>Skills</strong> — your actual named behaviors (e.g. <code>heel_stretch</code>, <code>seed_row_align</code>) and their command payloads. The output only stubs standard skills (stand/sit) where the category implies them.</li>
       <li><strong>Safety limits</strong> — your real e-stop topic, watchdog timeout, geofence, and speed limits. The draft ships placeholder values that will under- or over-constrain a real robot.</li>
       <li><strong>Transport credentials</strong> — your actual MQTT broker, topic namespace, or WebSocket port. Draft endpoints are placeholders.</li>
+      <li><strong>Units and ranges for your own sensors</strong> — a physical description file records that a sensor exists, never what its readings mean. Sensors the converter doesn't recognise are emitted as <code>unit="TODO" min="TODO" max="TODO"</code> on purpose, because a field a controller can't scale isn't renderable. Fill them in; don't delete them.</li>
       <li><strong>Morphology category</strong> — guessed from joint-name heuristics (hip/knee/ankle → leg, shoulder/elbow/wrist → arm, wheel/steer → wheeled). Usually right for real robots, shakier for generic or test models — always confirm <code>&lt;primary category&gt;</code> by hand.</li>
       <li><strong>Which actuators matter operationally</strong> — <code>custom_controls</code> is capped at 5 by design (RRCF is an operator panel, not a raw joint-teleop protocol). High-DOF models will have unmapped actuators listed in a comment for you to fold into <code>&lt;skills&gt;</code> or a dedicated <code>&lt;attach&gt;</code> block.</li>
     </ul>
@@ -141,6 +142,21 @@
       Treat the output as scaffolding: fill in the TODO-marked skill, safety,
       and transport blocks, and eyeball the category guess, before this file
       drives an actual robot or is published for third-party integrators.
+    </p>
+    <p>
+      You don't have to guess when it's ready. The draft is generated to satisfy
+      your category's mandatory field set and the self-description contract, so
+      the only thing standing between it and a conformant declaration is the
+      TODO-marked values only you know:
+    </p>
+    <pre style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12px;margin:0 0 12px;">pip install -r conformance/requirements.txt
+python -m rrcf_conformance lint my-robot.rrcf</pre>
+    <p style="margin-bottom:0;">
+      It names every outstanding item and exits non-zero until they're resolved —
+      see the
+      <a href="https://github.com/rrcf-foundation/RRCF/tree/main/conformance" target="_blank" rel="noopener">conformance tooling</a>.
+      Passing the linter means the file is complete; proving the robot actually
+      honours it is <code>check-session</code>, against a real capture.
     </p>
   </div>
 </details>
@@ -512,6 +528,66 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// Mirrors conformance/profiles/category-profiles.json in the RRCF repo, which
+// is the source of truth. Kept as literal XML so the emitted draft is exactly
+// what the linter expects to see.
+// https://github.com/rrcf-foundation/RRCF/blob/main/conformance/profiles/category-profiles.json
+const RRCF_KNOWN_FIELDS = {
+  battery:      '<field id="battery" type="number" unit="%" min="0" max="100" warn_below="20" label="Battery" widget="gauge"/>',
+  speed:        '<field id="speed" type="number" unit="m/s" min="0" max="5" label="Speed" widget="plot"/>',
+  temp:         '<field id="temp" type="number" unit="degC" min="-20" max="100" warn_above="55" label="Temperature" widget="gauge"/>',
+  heading:      '<field id="heading" type="number" unit="deg" min="0" max="360" label="Heading" widget="gauge"/>',
+  altitude:     '<field id="altitude" type="number" unit="m" min="0" max="500" label="Altitude" widget="gauge"/>',
+  depth:        '<field id="depth" type="number" unit="m" min="0" max="300" label="Depth" widget="gauge"/>',
+  pressure:     '<field id="pressure" type="number" unit="bar" min="0" max="35" label="Pressure" widget="gauge"/>',
+  rssi:         '<field id="rssi" type="number" unit="dBm" min="-120" max="0" warn_below="-80" label="Signal" widget="gauge"/>',
+  voltage:      '<field id="voltage" type="number" unit="V" min="0" max="60" label="Bus Voltage" widget="gauge"/>',
+  payload:      '<field id="payload" type="number" unit="kg" min="0" max="10" label="Payload" widget="gauge"/>',
+  joint_torque: '<field id="joint_torque" type="number" unit="Nm" min="-150" max="150" label="Peak Joint Torque" widget="plot"/>',
+  ee_pos:       '<field id="ee_pos" type="vector3" unit="m" min="-1.2" max="1.2" label="End Effector" widget="vector"/>',
+  gps:          '<field id="gps" type="enum" values="no_fix fix_2d fix_3d rtk" label="GPS Fix" widget="badge"/>',
+  balance:      '<field id="balance" type="enum" values="stable recovering fallen" label="Balance" widget="badge"/>'
+};
+
+function rrcfFields(ids) {
+  return ids.map(id => ({ id: id, xml: RRCF_KNOWN_FIELDS[id] })).filter(f => f.xml);
+}
+
+// Conservative default ceilings for a draft. A vendor is expected to replace
+// these with the model's real envelope; safety/speed_limit is generated to
+// bound exactly the axes declared, so no axis is left unbounded.
+const RRCF_AXIS_DEFAULTS = { vx: '1.0', vy: '0.5', vz: '0.5', wz: '1.5' };
+
+const RRCF_CATEGORY_LOCOMOTION = {
+  wheeled:            { axes: ['vx', 'wz'], modes: 'idle drive' },
+  legged:             { axes: ['vx', 'vy', 'wz'], modes: 'stand walk' },
+  loco_manip:         { axes: ['vx', 'wz'], modes: 'stand walk manipulate' },
+  wheeled_humanoid:   { axes: ['vx', 'wz'], modes: 'drive reach' },
+  full_humanoid:      { axes: ['vx', 'vy', 'wz'], modes: 'stand walk manipulate' },
+  manipulator:        { axes: [], modes: 'joint cartesian teach replay' },
+  aerial:             { axes: ['vx', 'vy', 'vz', 'wz'], modes: 'stabilize altitude loiter auto rtl' },
+  marine_surface:     { axes: ['vx', 'wz'], modes: 'manual hold auto loiter' },
+  marine_sub:         { axes: ['vx', 'vy', 'vz', 'wz'], modes: 'manual depth_hold stabilize auto' },
+  industrial_vehicle: { axes: ['vx', 'wz'], modes: 'idle drive work' },
+  agri_vehicle:       { axes: ['vx', 'wz'], modes: 'idle drive work' },
+  custom:             { axes: [], modes: 'idle active' }
+};
+
+const RRCF_CATEGORY_TELEMETRY = {
+  wheeled:            rrcfFields(['battery', 'speed', 'temp']),
+  legged:             rrcfFields(['battery', 'speed', 'temp']),
+  loco_manip:         rrcfFields(['battery', 'speed', 'temp', 'ee_pos']),
+  wheeled_humanoid:   rrcfFields(['battery', 'speed', 'temp', 'ee_pos']),
+  full_humanoid:      rrcfFields(['battery', 'speed', 'temp', 'balance', 'ee_pos']),
+  manipulator:        rrcfFields(['temp', 'ee_pos', 'joint_torque']),
+  aerial:             rrcfFields(['battery', 'altitude', 'speed', 'gps', 'rssi']),
+  marine_surface:     rrcfFields(['battery', 'heading', 'speed', 'gps']),
+  marine_sub:         rrcfFields(['battery', 'depth', 'heading', 'temp', 'pressure']),
+  industrial_vehicle: rrcfFields(['speed', 'heading', 'temp']),
+  agri_vehicle:       rrcfFields(['speed', 'heading', 'temp']),
+  custom:             []
+};
+
 function buildRrcf(info, category, metaName, vendor, sourceFilename, sourceFormat, overrideCat) {
   const cat = overrideCat || category;
   const slug = metaName.toLowerCase().replace(/\s+/g, '_');
@@ -543,15 +619,16 @@ function buildRrcf(info, category, metaName, vendor, sourceFilename, sourceForma
   out.push('  </meta>');
 
   out.push(`  <primary category="${esc(cat)}">`);
-  if (['legged','full_humanoid','loco_manip','wheeled','wheeled_humanoid'].includes(cat)) {
-    out.push(`    <locomotion axes="vx vy wz" max_vx="1.0" max_vy="0.5" max_wz="1.5"/>`);
-    const modes = (cat.includes('legged') || cat.includes('humanoid') || cat.includes('loco')) ? 'stand walk' : 'drive';
-    out.push(`    <modes>${modes}</modes>`);
-    if (cat.includes('humanoid') || cat.includes('legged') || cat.includes('loco')) {
-      out.push(`    <body_pose pitch="true" roll="true" height="true"/>`);
-    }
-  } else if (cat === 'manipulator') {
-    out.push(`    <modes>teach replay</modes>`);
+  const loco = RRCF_CATEGORY_LOCOMOTION[cat];
+  if (loco && loco.axes.length) {
+    const limits = loco.axes.map(a => `max_${a}="${RRCF_AXIS_DEFAULTS[a]}"`).join(' ');
+    out.push(`    <locomotion axes="${loco.axes.join(' ')}" ${limits}/>`);
+  }
+  if (loco && loco.modes) {
+    out.push(`    <modes>${loco.modes}</modes>`);
+  }
+  if (['legged', 'full_humanoid', 'loco_manip', 'wheeled_humanoid'].includes(cat)) {
+    out.push(`    <body_pose pitch="true" roll="true" height="true"/>`);
   }
   out.push('  </primary>');
 
@@ -613,25 +690,63 @@ function buildRrcf(info, category, metaName, vendor, sourceFilename, sourceForma
     out.push('  </custom_controls>');
   }
 
+  // Telemetry must satisfy two separate rules, so the draft emits both:
+  //  1. the category profile — which fields MUST exist for this morphology;
+  //  2. the self-description contract — every field carries type/unit/range,
+  //     so a generic controller can render it with no per-robot code.
+  // A physical description file cannot tell us a sensor's unit or range, so
+  // unknown sensors are emitted as explicit TODOs rather than as silently
+  // under-described fields. The draft is not conformant until they are filled
+  // in — run `rrcf-conformance lint` to see exactly what is outstanding.
   out.push('  <telemetry>');
-  if (info.sensors.length) {
-    info.sensors.forEach(s => out.push(`    <field id="${esc(s)}" unit=""/>`));
-  } else {
-    out.push(`    <field id="battery" unit="%" warn_below="20"/>`);
-    out.push(`    <!-- No sensors found in source ${sourceFormat.toUpperCase()} — battery field is a placeholder. -->`);
+  out.push('    <!-- Universal: required of every category. -->');
+  out.push('    <field id="estop_state" type="boolean" label="E-Stop" widget="indicator"/>');
+  out.push('    <field id="health" type="enum"');
+  out.push('           values="ready degraded rejected fault estop disconnected"');
+  out.push('           label="Health" widget="badge"/>');
+
+  const emitted = new Set(['estop_state', 'health']);
+  const profileFields = (RRCF_CATEGORY_TELEMETRY[cat] || []);
+  if (profileFields.length) {
+    out.push(`    <!-- Category profile: ${esc(cat)}. -->`);
+    profileFields.forEach(f => {
+      emitted.add(f.id);
+      out.push(`    ${f.xml}`);
+    });
+  }
+
+  const extras = info.sensors.filter(s => !emitted.has(s));
+  if (extras.length) {
+    out.push('    <!-- Detected in the source file. TODO: set type, unit and range');
+    out.push('         on each — a field a controller cannot scale is not renderable. -->');
+    extras.forEach(s => {
+      const known = RRCF_KNOWN_FIELDS[s];
+      if (known) {
+        out.push(`    ${known}`);
+      } else {
+        out.push(`    <field id="${esc(s)}" type="number" unit="TODO" min="TODO" max="TODO"/>`);
+      }
+    });
   }
   out.push('  </telemetry>');
 
   out.push('  <safety>');
   out.push(`    <estop required="true" topic="/rrcf/${esc(slug)}/estop" qos="2"/>`);
   out.push(`    <watchdog timeout_ms="500" action="halt"/>`);
-  if (locoActuators.length) out.push(`    <speed_limit max_vx="1.0" max_wz="1.5"/>`);
+  if (loco && loco.axes.length) {
+    // Bound every declared axis. An axis with a capability but no safety limit
+    // is an axis a controller has nothing to clamp against.
+    const bounds = loco.axes.map(a => `max_${a}="${RRCF_AXIS_DEFAULTS[a]}"`).join(' ');
+    out.push(`    <speed_limit ${bounds}/>`);
+  }
   out.push('  </safety>');
 
   out.push('  <transport>');
   out.push(`    <endpoint role="operator_cmd" protocol="rrcf_mqtt" topic="/rrcf/${esc(slug)}/cmd" broker="\${MQTT_BROKER}"/>`);
   out.push(`    <endpoint role="telemetry" protocol="mqtt" topic="/rrcf/${esc(slug)}/state" frequency_hz="10"/>`);
-  out.push(`    <endpoint role="websocket" protocol="websocket" port="9090"/>`);
+  out.push(`    <endpoint role="telemetry" protocol="websocket" port="9090" frequency_hz="10"/>`);
+  out.push(`    <!-- role is the purpose, protocol is the wire: a WebSocket telemetry`);
+  out.push(`         feed is role="telemetry" protocol="websocket", not role="websocket". -->`);
   out.push(`    <!-- TODO: replace placeholder broker/topic values before deployment. -->`);
   out.push('  </transport>');
 
