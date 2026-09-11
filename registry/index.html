@@ -6,8 +6,8 @@
 <title>RRCF Adapter Registry</title>
 <meta name="description" content="Foundation-governed Registry of RRCF endpoint Adapters for RRCA runtimes.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
-<script src="../assets/js/theme.js?v=20260910-layout"></script>
-<link rel="stylesheet" href="../assets/css/style.css?v=20260910-layout2">
+<script src="../assets/js/theme.js?v=20260911-contract"></script>
+<link rel="stylesheet" href="../assets/css/style.css?v=20260911-contract">
 </head>
 <body>
 <header class="site-nav">
@@ -105,20 +105,28 @@ probe -> initialize -> activate</pre>
     <h2>Publish an Adapter</h2>
     <div class="two-col">
       <ol class="guidance-list">
-        <li>Publish and version the model's XML <code>.rrcf</code> declaration.</li>
+        <li>Publish and version the model's XML <code>.rrcf</code> declaration, once <code>rrcf-conformance lint</code> passes with no errors.</li>
         <li>Implement one Adapter for the model or SDK family.</li>
         <li>Package it as <code>&lt;publisher&gt;.&lt;vendor&gt;.&lt;model&gt;.&lt;version&gt;.rrcf.adptr</code>.</li>
         <li>Declare compatibility for RRCF, RRCA, SDK/API, model, platform, capabilities, and applicable firmware.</li>
         <li>Submit a Registry pull request with license, provenance, digest, and conformance evidence.</li>
       </ol>
-      <div class="pillar-card">
-        <div class="num">BOUNDARY</div>
-        <h3>Calibration remains endpoint-specific</h3>
-        <p>Vendor firmware, SDK code, or the Adapter owns calibration, homing, simulator gains, and tuning. RRCA does not parse a standardized calibration record.</p>
+      <div>
+        <div class="pillar-card" style="margin-bottom:16px;">
+          <div class="num">EVIDENCE</div>
+          <h3>What <code>verified</code> actually requires</h3>
+          <p>A <code>rrcf-conformance check-session</code> report over a real capture from the target endpoint — not only a declaration that lints clean. A clean declaration proves the file is complete; it does not prove the robot honours it.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="num">BOUNDARY</div>
+          <h3>Calibration remains endpoint-specific</h3>
+          <p>Vendor firmware, SDK code, or the Adapter owns calibration, homing, simulator gains, and tuning. RRCA does not parse a standardized calibration record.</p>
+        </div>
       </div>
     </div>
     <div class="section-actions">
       <a class="btn btn-primary" href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/README.md">Read Registry guidance</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/tree/main/conformance">Conformance tooling</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/schema/adapter-manifest.schema.json">Manifest schema</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/issues/new">Propose an Adapter</a>
     </div>
