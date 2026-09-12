@@ -3,9 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>URDF/MJCF/SDF → RRCF Converter</title>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y2M32ZF21J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Y2M32ZF21J');
+</script>
+
+<title>URDF / MJCF / SDF → RRCF Converter — generate a draft .rrcf in your browser</title>
+<meta name="description" content="Drop a URDF, MJCF, or SDF robot description and get an editable draft .rrcf operator declaration back. Runs entirely client-side — nothing is uploaded.">
+<meta name="keywords" content="URDF to RRCF, MJCF to RRCF, SDF to RRCF, robot description converter, .rrcf generator, RRCF converter, robot operator declaration">
+<meta name="author" content="RRCF Foundation">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://rrcf-foundation.github.io/tools/converter.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RRCF Foundation">
+<meta property="og:title" content="URDF / MJCF / SDF → RRCF Converter">
+<meta property="og:description" content="Drop a robot description file, get an editable draft .rrcf back. Runs entirely in your browser — nothing is uploaded.">
+<meta property="og:url" content="https://rrcf-foundation.github.io/tools/converter.html">
+<meta property="og:image" content="https://rrcf-foundation.github.io/assets/images/RRCF_Robot_Remote_Control_Format_full.jpg">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="URDF / MJCF / SDF → RRCF Converter">
+<meta name="twitter:description" content="Drop a robot description file, get an editable draft .rrcf back — client-side, nothing uploaded.">
+<meta name="twitter:image" content="https://rrcf-foundation.github.io/assets/images/RRCF_Robot_Remote_Control_Format_full.jpg">
+
+<meta name="theme-color" content="#087f75">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
-<script src="../assets/js/theme.js?v=20260911-contract"></script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "URDF / MJCF / SDF → RRCF Converter",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (browser-based)",
+  "description": "Client-side converter that turns a URDF, MJCF, or SDF robot description into a draft .rrcf operator declaration.",
+  "url": "https://rrcf-foundation.github.io/tools/converter.html",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@type": "Organization", "name": "RRCF Foundation", "url": "https://rrcf-foundation.github.io/" }
+}
+</script>
+
+<script src="../assets/js/theme.js?v=20260912-seo"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
 <style>
