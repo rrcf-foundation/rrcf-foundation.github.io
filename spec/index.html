@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RRCF v0.4 Specification — Robot Remote Control Format</title>
+<meta name="description" content="The RRCF v0.4 draft specification — the Operator Interface Declaration Standard for Physical AI. Rendered from the canonical Markdown source.">
+<script src="../assets/js/theme.js?v=20260911-contract"></script>
+<link rel="stylesheet" href="../assets/css/style.css?v=20260911-contract">
+<style>
+  .spec-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; align-items: start; }
+  .spec-toc { position: sticky; top: 84px; max-height: calc(100vh - 104px); overflow-y: auto; font-size: 13px; border-right: 1px solid var(--line); padding-right: 16px; }
+  .spec-toc h4 { margin: 0 0 10px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .spec-toc a { display: block; padding: 3px 0; color: var(--dim); text-decoration: none; line-height: 1.4; }
+  .spec-toc a:hover { color: var(--accent); }
+  .spec-toc a.lvl-3 { padding-left: 14px; font-size: 12.5px; }
+  .spec-body { min-width: 0; }
+  .spec-body h1 { font-size: 30px; margin: 0 0 8px; }
+  .spec-body h2 { font-size: 22px; margin: 40px 0 12px; padding-top: 12px; border-top: 1px solid var(--line); scroll-margin-top: 84px; }
+  .spec-body h3 { font-size: 17px; margin: 26px 0 10px; scroll-margin-top: 84px; }
+  .spec-body p, .spec-body li { color: var(--text); font-size: 15px; line-height: 1.7; }
+  .spec-body table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; display: block; overflow-x: auto; }
+  .spec-body th, .spec-body td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  .spec-body th { background: var(--bg-alt); font-weight: 600; }
+  .spec-body pre { background: var(--panel-soft, var(--panel)); border: 1px solid var(--line); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; }
+  .spec-body code { font-family: var(--mono); font-size: .92em; background: var(--bg-alt); padding: 1px 5px; border-radius: 4px; }
+  .spec-body pre code { background: none; padding: 0; }
+  .spec-body blockquote { border-left: 3px solid var(--accent); margin: 16px 0; padding: 4px 16px; background: var(--accent-soft, var(--bg-alt)); border-radius: 0 6px 6px 0; }
+  .spec-body a { color: var(--accent); }
+  .spec-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
+  .spec-meta .fmt-pill { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-radius: 20px; padding: 3px 10px; color: var(--dim); }
+  .spec-status { padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg-alt); margin: 16px 0 24px; font-size: 13.5px; color: var(--dim); }
+  .spec-loading, .spec-error { padding: 40px 0; color: var(--dim); }
+  .spec-error a { color: var(--accent); }
+  @media (max-width: 860px) { .spec-layout { grid-template-columns: minmax(0,1fr); } .spec-toc { display: none; } }
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="container">
+    <a class="brand" href="../index.html" aria-label="RRCF home"><img src="../assets/images/rrcf_logo.png" alt="" style="height:26px;width:auto;display:block;"><span>RRCF</span></a>
+    <div class="nav-actions">
+      <nav class="links" aria-label="Specification navigation">
+        <a class="nav-secondary" href="../index.html#what">Why RRCF</a>
+        <a class="nav-secondary" href="../index.html#v04">New in v0.4</a>
+        <a class="nav-mobile" href="../registry/index.html">Registry</a>
+        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v04_RFC_Specification.md"><span class="icon" data-icon="github"></span>Source</a>
+      </nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span data-theme-icon aria-hidden="true">☾</span><span data-theme-label>Dark</span></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero hero-compact">
+  <div class="container content-narrow">
+    <span class="tag">RFC-STYLE DRAFT · v0.4 · APACHE 2.0</span>
+    <h1 style="margin:10px 0 6px;">RRCF Specification</h1>
+    <p class="lead">The Operator Interface Declaration Standard for Physical AI — rendered from the canonical Markdown source in the RRCF repository.</p>
+    <div class="spec-meta">
+      <span class="fmt-pill">v0.4 draft</span>
+      <span class="fmt-pill">Protocol 1.0-draft</span>
+      <span class="fmt-pill">Apache-2.0</span>
+      <a class="fmt-pill" href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">PDF edition ↗</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="spec-layout">
+      <aside class="spec-toc" id="specToc" aria-label="Table of contents"><h4>Contents</h4></aside>
+      <article class="spec-body" id="specBody">
+        <p class="spec-loading">Loading specification…</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <span>© 2026 RRCF Foundation · Apache License 2.0</span>
+    <nav class="links">
+      <a href="../index.html">Home</a>
+      <a href="https://github.com/rrcf-foundation/RRCF">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+// Canonical source: the Markdown spec lives in the RRCF repo. We render it here
+// so the site never keeps a second hand-edited copy of the specification prose.
+const SPEC_URL = 'https://raw.githubusercontent.com/rrcf-foundation/RRCF/main/spec/RRCF_v04_RFC_Specification.md';
+
+function slugify(text) {
+  return text.toLowerCase().trim()
+    .replace(/[`*_~]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function inline(md) {
+  // order matters: escape first, then re-introduce markup
+  let s = escapeHtml(md);
+  s = s.replace(/`([^`]+)`/g, (_, c) => '<code>' + c + '</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, h) => '<a href="' + h + '">' + t + '</a>');
+  return s;
+}
+function stripFrontmatter(md) {
+  if (md.startsWith('---')) {
+    const end = md.indexOf('\n---', 3);
+    if (end !== -1) return md.slice(md.indexOf('\n', end + 1) + 1);
+  }
+  return md;
+}
+function renderMarkdown(md) {
+  const lines = stripFrontmatter(md).split('\n');
+  const out = [];
+  const toc = [];
+  let i = 0;
+  while (i < lines.length) {
+    let line = lines[i];
+    // fenced code block
+    if (/^```/.test(line)) {
+      const buf = [];
+      i++;
+      while (i < lines.length && !/^```/.test(lines[i])) { buf.push(escapeHtml(lines[i])); i++; }
+      i++;
+      out.push('<pre><code>' + buf.join('\n') + '</code></pre>');
+      continue;
+    }
+    // headings
+    const h = line.match(/^(#{1,4})\s+(.*)$/);
+    if (h) {
+      const level = h[1].length;
+      const text = h[2].trim();
+      const id = slugify(text);
+      if (level === 2 || level === 3) toc.push({ level, text, id });
+      out.push('<h' + level + ' id="' + id + '">' + inline(text) + '</h' + level + '>');
+      i++;
+      continue;
+    }
+    // table
+    if (/^\|/.test(line) && i + 1 < lines.length && /^\|[\s:|-]+\|?$/.test(lines[i + 1])) {
+      const header = line.split('|').slice(1, -1).map(c => c.trim());
+      i += 2;
+      const rows = [];
+      while (i < lines.length && /^\|/.test(lines[i])) {
+        rows.push(lines[i].split('|').slice(1, -1).map(c => c.trim()));
+        i++;
+      }
+      let t = '<table><thead><tr>' + header.map(c => '<th>' + inline(c) + '</th>').join('') + '</tr></thead><tbody>';
+      t += rows.map(r => '<tr>' + r.map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>').join('');
+      t += '</tbody></table>';
+      out.push(t);
+      continue;
+    }
+    // blockquote
+    if (/^>\s?/.test(line)) {
+      const buf = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) { buf.push(lines[i].replace(/^>\s?/, '')); i++; }
+      out.push('<blockquote>' + inline(buf.join(' ')) + '</blockquote>');
+      continue;
+    }
+    // list
+    if (/^\s*[-*]\s+/.test(line)) {
+      const buf = [];
+      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+        buf.push('<li>' + inline(lines[i].replace(/^\s*[-*]\s+/, '')) + '</li>');
+        i++;
+      }
+      out.push('<ul>' + buf.join('') + '</ul>');
+      continue;
+    }
+    // ordered list
+    if (/^\s*\d+\.\s+/.test(line)) {
+      const buf = [];
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
+        buf.push('<li>' + inline(lines[i].replace(/^\s*\d+\.\s+/, '')) + '</li>');
+        i++;
+      }
+      out.push('<ol>' + buf.join('') + '</ol>');
+      continue;
+    }
+    // horizontal rule
+    if (/^---+$/.test(line.trim())) { out.push('<hr>'); i++; continue; }
+    // blank
+    if (line.trim() === '') { i++; continue; }
+    // paragraph (gather until blank or block start)
+    const buf = [line];
+    i++;
+    while (i < lines.length && lines[i].trim() !== '' &&
+           !/^(#{1,4}\s|```|>|\s*[-*]\s|\s*\d+\.\s|\|)/.test(lines[i])) {
+      buf.push(lines[i]); i++;
+    }
+    out.push('<p>' + inline(buf.join(' ')) + '</p>');
+  }
+  return { html: out.join('\n'), toc };
+}
+
+fetch(SPEC_URL)
+  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+  .then(md => {
+    const { html, toc } = renderMarkdown(md);
+    document.getElementById('specBody').innerHTML = html;
+    const nav = toc.map(t =>
+      '<a class="lvl-' + t.level + '" href="#' + t.id + '">' + t.text.replace(/`/g, '') + '</a>'
+    ).join('');
+    document.getElementById('specToc').insertAdjacentHTML('beforeend', nav);
+  })
+  .catch(err => {
+    document.getElementById('specBody').innerHTML =
+      '<p class="spec-error">Could not load the specification (' + err.message + '). ' +
+      'Read it directly on <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v04_RFC_Specification.md">GitHub</a> ' +
+      'or as a <a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">PDF</a>.</p>';
+  });
+</script>
+</body>
+</html>

@@ -12,12 +12,18 @@ this repo is the marketing/docs site built on top of it.
 
 ```
 index.html              landing page
+spec/index.html         specification reader — renders the canonical Markdown spec from the RRCF repo
 assets/css/style.css    site stylesheet
 assets/js/              theme + icon scripts
 tools/converter.html    browser-based URDF/MJCF/SDF → .rrcf converter (self-contained, no build step)
 demo/index.html         controller reference implementation (React, runs in-browser)
 registry/index.html     Adapter Registry browser
 ```
+
+The specification prose is **not** duplicated here. `spec/index.html` fetches
+[`spec/RRCF_v04_RFC_Specification.md`](https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v04_RFC_Specification.md)
+from the RRCF repo at runtime (the same way images are sourced) and renders it,
+so the spec has a single source of truth.
 
 **No binary assets are stored in this repo.** Images are served directly from
 [`rrcf-foundation/RRCF/images/`](https://github.com/rrcf-foundation/RRCF/tree/main/images)
