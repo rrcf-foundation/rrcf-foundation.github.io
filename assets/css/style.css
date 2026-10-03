@@ -91,6 +91,7 @@ nav.links .icon { width: 14px; height: 14px; }
 .hero .tag { display: inline-flex; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--accent2); border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 12px; margin-bottom: 18px; }
 .hero-name { font-family: var(--mono); font-size: 14px; font-weight: 700; letter-spacing: .04em; color: var(--text); margin-bottom: 12px; }
 .hero-name-full { font-weight: 400; color: var(--dim); letter-spacing: normal; }
+.hero-dot { color: var(--accent); }
 .hero h1 { max-width: 720px; font-size: clamp(38px, 5vw, 60px); line-height: 1.08; margin: 0 0 20px; letter-spacing: -.035em; font-weight: 750; }
 .hero h1 .hl { color: var(--accent); }
 .hero p.lead { max-width: 660px; margin: 0 0 28px; font-size: 17px; color: var(--dim); }

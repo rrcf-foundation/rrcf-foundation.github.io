@@ -18,8 +18,6 @@
       <nav class="links" aria-label="Primary navigation">
         <a class="nav-secondary" href="#what">Why RRCF</a>
         <a class="nav-mobile" href="#rrca">Architecture</a>
-        <a class="nav-secondary" href="#v04">New in v0.4</a>
-        <a class="nav-secondary" href="spec/">Spec</a>
         <a class="nav-mobile" href="registry/index.html">Registry</a>
         <a class="nav-secondary" href="#tools">Resources</a>
       </nav>
@@ -32,12 +30,12 @@
   <div class="container hero-grid">
     <div class="hero-copy">
       <span class="tag"><a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf" style="color:inherit;text-decoration:none;">RFC-STYLE DRAFT · v0.4 · APACHE 2.0</a></span>
-      <div class="hero-name">RRCF <span class="hero-name-full">Robot Remote Control Format</span></div>
-      <h1>The <span class="hl">operator interface</span> standard for Physical AI.</h1>
-      <p class="lead">An open, machine-readable format for declaring how a robot is controlled, monitored, and operated safely. Publish one endpoint Adapter; keep controllers generic.</p>
+      <div class="hero-name"><span class="hero-dot">.RRCF</span> <span class="hero-name-full">Robot Remote Control Format</span></div>
+      <h1>Robots to the World, <span class="hl">Made Easy.</span></h1>
+      <p class="lead">An open standard that seamlessly connects robots, controllers, operators, AI and the world around them.</p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="spec/"><span class="icon" data-icon="doc"></span>Read the specification</a>
-        <a class="btn btn-secondary" href="registry/index.html"><span class="icon" data-icon="database"></span>Explore the Registry</a>
+        <a class="btn btn-primary" href="spec/"><span class="icon" data-icon="doc"></span>Are you .RRCF Ready?</a>
+        <a class="btn btn-secondary" href="registry/index.html"><span class="icon" data-icon="database"></span>Explore the Standard</a>
       </div>
       <div class="resource-links">
         <a href="demo/index.html"><span class="icon" data-icon="play"></span>Live demo</a>
@@ -154,7 +152,7 @@ Robot or simulator</pre>
 <section id="categories">
   <div class="container">
     <div class="eyebrow"><span class="icon" data-icon="custom"></span>Morphology taxonomy</div>
-    <h2>Thirteen canonical categories</h2>
+    <h2>Twelve canonical categories</h2>
     <p class="section-sub">Every robot declares exactly one primary category, with capabilities layered on as attachments (arms, grippers, sensors, tools).</p>
     <p class="inline-note" style="margin:0 0 24px;">
       A category is not just a label — it decides which control axes and which
@@ -176,7 +174,6 @@ Robot or simulator</pre>
       <div class="cat-chip"><span class="icon" data-icon="marine_sub"></span><span><span class="id">marine_sub</span><span class="label">Marine Underwater</span><span class="ex">BlueROV2, VideoRay ROV</span></span></div>
       <div class="cat-chip"><span class="icon" data-icon="industrial_vehicle"></span><span><span class="id">industrial_vehicle</span><span class="label">Industrial Vehicle</span><span class="ex">CAT excavator, Komatsu dozer</span></span></div>
       <div class="cat-chip"><span class="icon" data-icon="agri_vehicle"></span><span><span class="id">agri_vehicle</span><span class="label">Agricultural Vehicle</span><span class="ex">John Deere autonomy, Naïo Oz</span></span></div>
-      <div class="cat-chip"><span class="icon" data-icon="wheeled"></span><span><span class="id">road_vehicle</span><span class="label">On-Road Vehicle (AV/EV)</span><span class="ex">Waymo, Zoox, robotaxi / EV fleets</span></span></div>
       <div class="cat-chip"><span class="icon" data-icon="custom"></span><span><span class="id">custom</span><span class="label">Custom (vendor-defined)</span><span class="ex">Medical, nano, space, soft robot</span></span></div>
     </div>
   </div>
@@ -246,16 +243,11 @@ Robot or simulator</pre>
           document is retrieved for RAG.
         </p>
         <ul style="color:var(--dim); font-size:14.5px; line-height:1.9; padding-left:20px;">
-          <li><strong>Tier 1 — discrete skills (zero-shot).</strong> Matching an instruction to a declared <code>skill_id</code> and emitting its pre-authored command is standard tool-calling; vendor-specific skills become available instantly because the declaration <em>is</em> the context — no retraining.</li>
-          <li><strong>Tier 2 — continuous control.</strong> Producing a pose delta or joint target needs a policy already conditioned on the declared action space. The <code>.rrcf</code> supplies the <em>target</em> space; the unnormalization statistics live in the policy checkpoint, not the file. Loading the file is not a substitute for that training.</li>
-          <li>Generated commands, in either tier, are bounded by the declared safety limits.</li>
+          <li>Declared skills extend the VLA's action vocabulary at runtime — no fine-tuning required.</li>
+          <li>Vendor-specific skills become available instantly, because the declaration <em>is</em> the context.</li>
+          <li>Generated commands are bounded by the declared safety limits.</li>
           <li>The model reads observations the same way a dashboard does: every telemetry field arrives with its declared type, unit, and range, so <code>battery: 18</code> is unambiguously 18% and 2 below the warning threshold — not a number needing a vendor lookup.</li>
         </ul>
-        <p class="inline-note" style="margin-top:14px;">
-          v0.4 keeps these tiers explicit so an implementation never presents
-          Tier 2 as if it were zero-shot. See
-          <a href="spec/#9-vla-integration--rag-for-robots">spec §9</a>.
-        </p>
       </div>
       <div>
         <pre class="code-block"><span class="cm">// every input modality produces the same
@@ -348,103 +340,34 @@ FAIL  no-telemetry-endpoint.rrcf
   </div>
 </section>
 
-<section id="v04">
-  <div class="container">
-    <div class="eyebrow"><span class="icon" data-icon="layers"></span>New in v0.4</div>
-    <h2>Vehicles, replay, and multi-party declarations</h2>
-    <p class="section-sub">
-      v0.4 extends the operator layer beyond a single self-contained robot: to
-      on-road vehicles with graded remote authority, to replaying recorded data
-      onto any target, and to declarations authored by several parties across a
-      shared space and a physical unit's lifecycle.
-    </p>
-    <div class="pillars">
-      <div class="pillar-card">
-        <div class="num"><span class="icon" data-icon="controller"></span></div>
-        <h3>Vehicles &amp; authority tiers</h3>
-        <p>The <code>road_vehicle</code> category binds steering, throttle, and
-        brake. Following SAE J3016, the <code>&lt;safety&gt;</code> block declares
-        <strong>speed-gated authority tiers</strong>: below a threshold an
-        operator drives directly; above it the panel automatically renders
-        <strong>remote-assistance-only</strong> controls (route confirmation,
-        waypoint grant) with no direct actuation.</p>
-      </div>
-      <div class="pillar-card">
-        <div class="num"><span class="icon" data-icon="record"></span></div>
-        <h3>Data replay</h3>
-        <p>A declared <strong>replay endpoint</strong> accepts the same wire
-        format as live control and plays it to a physical or simulated target,
-        under the same e-stop and watchdog rules. One converter per source
-        format — sim, egocentric video, an imitation-learning dataset — reaches
-        any RRCF robot. The converter is a separate artifact; RRCF standardizes
-        the replay path, not command inference from raw data.</p>
-      </div>
-      <div class="pillar-card">
-        <div class="num"><span class="icon" data-icon="network"></span></div>
-        <h3>Environment declaration</h3>
-        <p>GPS availability, indoor/outdoor space, and geofence bounds are
-        properties of the <em>space</em>, not the robot. An
-        <code>environment</code> block is inlined for a standalone robot or
-        referenced by a whole fleet, with a <code>degradation_behavior</code>
-        enforced by the same e-stop/watchdog machinery.</p>
-      </div>
-      <div class="pillar-card">
-        <div class="num"><span class="icon" data-icon="database"></span></div>
-        <h3>Composition &amp; overlays</h3>
-        <p>A downstream document never forks an upstream one — it references the
-        base by <code>{ref, version, hash}</code> and declares only the delta.
-        Any change to payload or reach MUST carry a <code>derived_limits</code>
-        block with <code>oem_certified</code> or <code>integrator_declared</code>
-        provenance, or full-capability operation is refused.</p>
-      </div>
-      <div class="pillar-card">
-        <div class="num"><span class="icon" data-icon="shield"></span></div>
-        <h3>Identity &amp; lifecycle</h3>
-        <p>A <code>unit_id</code> anchors a resolved declaration to one physical
-        robot. Safety-scoped lifecycle fields
-        (<code>last_verified</code>, <code>service_due</code>) can degrade
-        capability or warn past a verification window. Maintenance-ticket detail
-        stays at the platform layer, referenced by <code>unit_id</code>.</p>
-      </div>
-      <div class="pillar-card">
-        <div class="num"><span class="icon" data-icon="doc"></span></div>
-        <h3>Read the full v0.4 spec</h3>
-        <p>Vehicle control-binding, authority tiers, replay, environment,
-        composition, and identity are all normative in the v0.4 draft.
-        <a href="spec/">Read the rendered specification →</a></p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section id="foxglove">
   <div class="container">
     <div class="eyebrow"><span class="icon" data-icon="record"></span>Recording &amp; playback</div>
     <h2>rosbag / MCAP + Foxglove</h2>
     <p class="section-sub">
-      <a href="https://mcap.dev/" target="_blank" rel="noopener">MCAP</a> stores
-      heterogeneous timestamped streams and supports JSON with JSON Schema. When
-      an adapter records RRCF command and declared-telemetry topics into MCAP,
-      Foxglove can inspect and plot that data — with the limits stated honestly.
+      If a robot's command and telemetry topics are already emitted in RRCF's
+      wire format, recording them into an
+      <a href="https://mcap.dev/" target="_blank" rel="noopener">MCAP</a> file
+      (which natively supports arbitrary JSON-schema channels) is a real,
+      concrete win today — not a hypothetical one.
     </p>
     <div class="two-col">
       <div>
         <ul style="color:var(--dim); font-size:14.5px; line-height:1.9; padding-left:20px; margin:0;">
-          <li><strong style="color:var(--text);">Raw Messages and Plot work with recorded RRCF data.</strong> Because field names, units, and ranges are declared rather than per-vendor, the fields mean the same thing across robots — so a <code>sit</code> skill call or an <code>estop:true</code> event is comparable whether it came from a Go2 or a Franka arm.</li>
-          <li><strong style="color:var(--text);">3D is not automatic.</strong> Foxglove's 3D panel renders only supported ROS/Foxglove schemas and needs valid frame data; custom RRCF JSON must first be transformed with a user script or message-converter extension.</li>
-          <li><strong style="color:var(--text);">Layout reuse is conditional.</strong> A template is reusable when topic paths (or aliases/variables) and field identifiers are kept stable — RRCF standardizes the field semantics, not the topic namespace.</li>
-          <li><strong style="color:var(--text);">A recorded session doubles as a conformance artifact.</strong> The same capture is valid input to <code>rrcf-conformance check-session</code> — how a vendor proves the robot honours its declaration, not just that the file parses.</li>
+          <li><strong style="color:var(--text);">One Foxglove layout, any robot.</strong> Build a layout once against the RRCF wire format and it works unmodified for a wheeled robot, a drone, or a humanoid — the generic Plot, Raw, and 3D panels read the declared units and ranges rather than needing a hand-built config per vendor.</li>
+          <li><strong style="color:var(--text);">Recordings are comparable across robots and vendors.</strong> A <code>sit</code> skill call or an <code>estop:true</code> event looks identical in the file whether it came from a Go2 or a Franka arm, so two fleets' logs can be diffed instead of translated.</li>
+          <li><strong style="color:var(--text);">A recorded session doubles as a conformance artifact.</strong> The same capture you opened in Foxglove is valid input to <code>rrcf-conformance check-session</code> — which is how a vendor proves the robot honours its declaration, not just that the file parses.</li>
         </ul>
       </div>
       <div>
-        <pre class="code-block"><span class="cm"># record directly to MCAP with the ROS 2
-# MCAP storage plugin (-s mcap)</span>
+        <pre class="code-block"><span class="cm"># buildable now, on top of what's already public —
+# no new tooling required on either side</span>
 
-<span class="attr">ros2</span> bag record -s mcap /rrcf/go2/cmd /rrcf/go2/state
+<span class="attr">ros2</span> bag record /rrcf/go2/cmd /rrcf/go2/state
 
-<span class="cm"># open the result in Foxglove: inspect raw fields
-# and plot numeric paths. Convert spatial data to a
-# ROS/Foxglove schema before expecting the 3D panel.</span>
+<span class="cm"># open the result in Foxglove — the same layout
+# works for /rrcf/drone_01/state, /rrcf/franka_arm/state,
+# any RRCF-compliant robot</span>
 
 <span class="cm"># and check the robot against its own declaration</span>
 <span class="attr">rrcf-conformance</span> check-session go2.rrcf session.jsonl</pre>
@@ -581,18 +504,17 @@ FAIL  no-telemetry-endpoint.rrcf
       </div>
       <div class="tool-card">
         <h3><span class="icon" data-icon="play"></span>Live Controller Demo</h3>
-        <p>Run the controller-side reference implementation directly in your browser — switch between nine of the thirteen categories, no install.</p>
+        <p>Run the controller-side reference implementation directly in your browser — switch between nine of the twelve categories, no install.</p>
         <a class="btn btn-primary" href="demo/index.html">Open Demo</a>
       </div>
       <div class="tool-card">
-        <h3><span class="icon" data-icon="doc"></span>Specification (v0.4 draft)</h3>
-        <p>The full RFC-style spec — motivation, five pillars, wire format, VLA tiers, vehicle authority tiers, replay, environment, composition, identity, conformance, and governance.</p>
-        <a class="btn btn-primary" href="spec/">Read online</a>
-        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">PDF</a>
+        <h3><span class="icon" data-icon="doc"></span>Specification</h3>
+        <p>The full RFC-style spec — motivation, schema, wire format, conformance requirements, and governance roadmap.</p>
+        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">Read PDF</a>
       </div>
       <div class="tool-card">
         <h3><span class="icon" data-icon="controller"></span>Controller Reference (React)</h3>
-        <p>A working React operator console driven entirely from the category declaration. Covers nine of the thirteen categories — <code>industrial_vehicle</code>, <code>agri_vehicle</code>, <code>road_vehicle</code>, and <code>custom</code> are specified but not yet implemented here.</p>
+        <p>A working React operator console driven entirely from the category declaration. Covers nine of the twelve categories — <code>industrial_vehicle</code>, <code>agri_vehicle</code>, and <code>custom</code> are specified but not yet implemented here.</p>
         <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation">View on GitHub</a>
       </div>
       <div class="tool-card">
