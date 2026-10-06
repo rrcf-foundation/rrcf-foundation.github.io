@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RRCF v0.4 Specification — Robot Remote Control Format</title>
-<meta name="description" content="The RRCF v0.4 draft specification — the Operator Interface Declaration Standard for Physical AI. Rendered from the canonical Markdown source.">
+<title>RRCF v0.6 Specification — Robot Remote Control Format</title>
+<meta name="description" content="The RRCF v0.6 draft specification — the Operator Interface Declaration Standard for Physical AI. Rendered from the canonical Markdown source.">
 <script src="../assets/js/theme.js?v=20260911-contract"></script>
 <link rel="stylesheet" href="../assets/css/style.css?v=20260911-contract">
 <style>
@@ -43,9 +43,9 @@
     <div class="nav-actions">
       <nav class="links" aria-label="Specification navigation">
         <a class="nav-secondary" href="../index.html#what">Why RRCF</a>
-        <a class="nav-secondary" href="../index.html#v04">New in v0.4</a>
+        <a class="nav-secondary" href="../index.html#guardrails">New in v0.6</a>
         <a class="nav-mobile" href="../registry/index.html">Registry</a>
-        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v04_RFC_Specification.md"><span class="icon" data-icon="github"></span>Source</a>
+        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md"><span class="icon" data-icon="github"></span>Source</a>
       </nav>
       <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span data-theme-icon aria-hidden="true">☾</span><span data-theme-label>Dark</span></button>
     </div>
@@ -54,14 +54,15 @@
 
 <section class="hero hero-compact">
   <div class="container content-narrow">
-    <span class="tag">RFC-STYLE DRAFT · v0.4 · APACHE 2.0</span>
+    <span class="tag">RFC-STYLE DRAFT · v0.6 · APACHE 2.0</span>
     <h1 style="margin:10px 0 6px;">RRCF Specification</h1>
     <p class="lead">The Operator Interface Declaration Standard for Physical AI — rendered from the canonical Markdown source in the RRCF repository.</p>
     <div class="spec-meta">
-      <span class="fmt-pill">v0.4 draft</span>
+      <span class="fmt-pill">v0.6 draft</span>
       <span class="fmt-pill">Protocol 1.0-draft</span>
       <span class="fmt-pill">Apache-2.0</span>
-      <a class="fmt-pill" href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">PDF edition ↗</a>
+      <a class="fmt-pill" href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md">Markdown source ↗</a>
+      <a class="fmt-pill" href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.docx">DOCX edition ↗</a>
     </div>
   </div>
 </section>
@@ -90,7 +91,7 @@
 <script>
 // Canonical source: the Markdown spec lives in the RRCF repo. We render it here
 // so the site never keeps a second hand-edited copy of the specification prose.
-const SPEC_URL = 'https://raw.githubusercontent.com/rrcf-foundation/RRCF/main/spec/RRCF_v04_RFC_Specification.md';
+const SPEC_URL = 'https://raw.githubusercontent.com/rrcf-foundation/RRCF/main/spec/RRCF_v06_RFC_Specification.md';
 
 function slugify(text) {
   return text.toLowerCase().trim()
@@ -216,8 +217,8 @@ fetch(SPEC_URL)
   .catch(err => {
     document.getElementById('specBody').innerHTML =
       '<p class="spec-error">Could not load the specification (' + err.message + '). ' +
-      'Read it directly on <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v04_RFC_Specification.md">GitHub</a> ' +
-      'or as a <a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">PDF</a>.</p>';
+      'Read it directly on <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md">GitHub</a> ' +
+      'or download the <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.docx">DOCX edition</a>.</p>';
   });
 </script>
 </body>

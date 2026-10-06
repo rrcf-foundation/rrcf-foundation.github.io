@@ -29,7 +29,7 @@
 <section class="hero">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <span class="tag"><a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf" style="color:inherit;text-decoration:none;">RFC-STYLE DRAFT · v0.4 · APACHE 2.0</a></span>
+      <span class="tag"><a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md" style="color:inherit;text-decoration:none;">RFC-STYLE DRAFT · v0.6 · APACHE 2.0</a></span>
       <div class="hero-wordmark">.RRCF</div>
       <div class="hero-subtitle">Robot Remote Control Format</div>
       <h1>Robots to the World, <span class="hl">Made Easy.</span></h1>
@@ -153,7 +153,7 @@ Robot or simulator</pre>
 <section id="categories">
   <div class="container">
     <div class="eyebrow"><span class="icon" data-icon="custom"></span>Morphology taxonomy</div>
-    <h2>Twelve canonical categories</h2>
+    <h2>Thirteen canonical categories</h2>
     <p class="section-sub">Every robot declares exactly one primary category, with capabilities layered on as attachments (arms, grippers, sensors, tools).</p>
     <p class="inline-note" style="margin:0 0 24px;">
       A category is not just a label — it decides which control axes and which
@@ -175,6 +175,7 @@ Robot or simulator</pre>
       <div class="cat-chip"><span class="icon" data-icon="marine_sub"></span><span><span class="id">marine_sub</span><span class="label">Marine Underwater</span><span class="ex">BlueROV2, VideoRay ROV</span></span></div>
       <div class="cat-chip"><span class="icon" data-icon="industrial_vehicle"></span><span><span class="id">industrial_vehicle</span><span class="label">Industrial Vehicle</span><span class="ex">CAT excavator, Komatsu dozer</span></span></div>
       <div class="cat-chip"><span class="icon" data-icon="agri_vehicle"></span><span><span class="id">agri_vehicle</span><span class="label">Agricultural Vehicle</span><span class="ex">John Deere autonomy, Naïo Oz</span></span></div>
+      <div class="cat-chip"><span class="icon" data-icon="road_vehicle"></span><span><span class="id">road_vehicle</span><span class="label">On-Road Vehicle (AV/EV)</span><span class="ex">Waymo, Zoox, Tesla FSD, robotaxi fleets</span></span></div>
       <div class="cat-chip"><span class="icon" data-icon="custom"></span><span><span class="id">custom</span><span class="label">Custom (vendor-defined)</span><span class="ex">Medical, nano, space, soft robot</span></span></div>
     </div>
   </div>
@@ -226,8 +227,8 @@ Robot or simulator</pre>
   <span class="tag">&lt;/transport&gt;</span>
 <span class="tag">&lt;/rrcf&gt;</span></pre>
     <p style="margin-top:16px; font-size:13.5px; color:var(--dim);">
-      Full annotated example with HUD, all five input modalities, and custom controls: see
-      <a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">spec §7.1</a>.
+      Full annotated example with HUD, all five input modalities, guard rails, and custom controls: see
+      <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md#71-complete-example--unitree-go2--z1-arm">spec §7.1</a>.
     </p>
   </div>
 </section>
@@ -481,9 +482,141 @@ FAIL  no-telemetry-endpoint.rrcf
       <a class="btn btn-primary" href="https://github.com/rrcf-foundation/RRCF/tree/main/conformance"><span class="icon" data-icon="shield"></span>Conformance tooling</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/conformance/profiles/category-profiles.json">Per-category field matrix</a>
       <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/conformance/schema/rrcf-declaration.schema.json">Declaration schema</a>
+      <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md#17-guard-rails-gr">Guard Rails (v0.6 §17)</a>
     </div>
   </div>
 </section>
+
+
+<section id="guardrails">
+  <div class="container">
+    <div class="eyebrow"><span class="icon" data-icon="shield"></span>New in v0.6 · Guard Rails</div>
+    <h2>Hard operating bounds, enforced before a command is ever issued</h2>
+    <p class="section-sub">
+      A guard rail (<code>gr:</code>) is a hard limit on any controllable numeric value in a declaration — a
+      locomotion axis, a skill parameter, an end-effector bound — enforced identically regardless of
+      whether the command comes from a human operator, a VLA, or a replayed dataset.
+    </p>
+    <div class="two-col">
+      <div>
+        <p style="margin:0 0 14px; font-size:15px;">
+          Guard rails are not a dedicated block. A <code>gr:</code> attribute prefix may appear on
+          <em>any</em> element that declares a controllable numeric value. The resolved
+          <strong>Effective GR</strong> is the minimum across four composition layers:
+          vendor-certified → integrator → venue → task.
+        </p>
+        <ul style="color:var(--dim); font-size:14.5px; line-height:1.9; padding-left:20px;">
+          <li>A compliant robot MUST <strong>reject</strong> (not merely clamp) a command that violates a resolved <code>gr:</code> bound.</li>
+          <li>Violations MUST be reported on the telemetry channel.</li>
+          <li>A <code>gr:</code> attribute can only <em>tighten</em>, never loosen, a declared capability.</li>
+          <li>Environment-level guardrails constrain shared IoT devices (stove, knife-capable arm, door lock) across all robots in a space.</li>
+        </ul>
+      </div>
+      <div>
+        <pre class="code-block"><span class="cm">&lt;!-- gr: tightens the declared max on any element --&gt;</span>
+<span class="tag">&lt;locomotion</span> <span class="attr">axes</span>=<span class="str">"vx vy wz"</span>
+            <span class="attr">max_vx</span>=<span class="str">"1.5"</span> <span class="attr">max_vy</span>=<span class="str">"0.5"</span>
+            <span class="attr">gr:max_vx</span>=<span class="str">"1.2"</span> <span class="attr">gr:max_vy</span>=<span class="str">"0.3"</span><span class="tag">/&gt;</span>
+
+<span class="tag">&lt;ee_control</span> <span class="attr">cartesian</span>=<span class="str">"true"</span> <span class="attr">max_force</span>=<span class="str">"40N"</span>
+            <span class="attr">gr:max_force</span>=<span class="str">"20N"</span> <span class="attr">gr:max_reach</span>=<span class="str">"950mm"</span><span class="tag">/&gt;</span>
+
+<span class="tag">&lt;skill</span> <span class="attr">id</span>=<span class="str">"cut_onion"</span> <span class="attr">label</span>=<span class="str">"Cut Onion"</span>
+       <span class="attr">cmd</span>=<span class="str">'{"mode":"cut"}'</span>
+       <span class="attr">gr:knife_height</span>=<span class="str">"5in"</span> <span class="attr">gr:knife_lateral</span>=<span class="str">"5in"</span><span class="tag">/&gt;</span></pre>
+      </div>
+    </div>
+    <div class="section-actions">
+      <a class="btn btn-primary" href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md#17-guard-rails-gr"><span class="icon" data-icon="doc"></span>Read Guard Rails spec §17</a>
+    </div>
+  </div>
+</section>
+
+<section id="registry">
+  <div class="container">
+    <div class="eyebrow"><span class="icon" data-icon="database"></span>New in v0.6 · Registry &amp; Discovery</div>
+    <h2>Two Foundation-governed registries; discovery as lookup</h2>
+    <p class="section-sub">
+      v0.6 formalises how controllers find adapters and how licensing authorities track deployed units —
+      without defining a new network-discovery protocol.
+    </p>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h3><span class="icon" data-icon="database"></span>Adapter Registry</h3>
+        <p>Public, versioned index mapping <code>{category, vendor, model}</code> to the matching <code>.rrcf.adptr</code> and RRCA Spec version it targets. Controllers discover adapters by querying this registry rather than bundling every possible robot SDK.</p>
+        <a class="btn btn-primary" href="registry/index.html">Browse Registry</a>
+      </div>
+      <div class="tool-card">
+        <h3><span class="icon" data-icon="lock"></span>Unit &amp; Licensing Registry</h3>
+        <p>Deployed units MAY be registered under a licensing authority (the RRCF Foundation or a local regulatory body) keyed by <code>unit_id</code>. Guard-rail violations and safety-relevant composition changes SHOULD be reported here.</p>
+        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md#18-registry-and-discovery">Read spec §18</a>
+      </div>
+      <div class="tool-card">
+        <h3><span class="icon" data-icon="network"></span>Discovery = Registry Lookup</h3>
+        <p>RRCF does not define a new network-discovery protocol — it defines what gets looked up and where. Transport-level discovery (mDNS, fleet platform device lists) is left to the deployment.</p>
+        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/README.md">Registry guidance</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="integration-manual">
+  <div class="container">
+    <div class="eyebrow"><span class="icon" data-icon="book"></span>New in v0.6 · Robot Integration Manual</div>
+    <h2>One declaration, three consumers</h2>
+    <p class="section-sub">
+      A single <code>.rrcf</code> declaration serves a human operator (generates readable operating
+      instructions), a control UI or VLA agent (renders the operator interface), and a validator
+      (checks conformance) — all at once.
+    </p>
+    <div class="two-col">
+      <div>
+        <p style="margin:0 0 14px; font-size:15px;">
+          A conventional robot ships with a PDF manual, a vendor SDK or control app, and a separate
+          compliance checklist. RRCF collapses these into one authored artifact: a vendor that
+          accurately documents its robot in <code>.rrcf</code> has, as a byproduct, satisfied the
+          integration requirement — no separate SDK onboarding needed.
+        </p>
+        <pre class="code-block">           RRCF Declaration (.rrcf)
+                     |
+          +----------+----------+
+          |          |          |
+     User Manual  Control UI  Validator
+     (human         (operator/     |
+      reader)        AI agent)     v
+                               vendor.robot
+                               .rrcf.adptr</pre>
+      </div>
+      <div>
+        <pre class="code-block"><span class="cm"># A Validator renders a declaration directly
+# into a human-readable summary:</span>
+
+Robot: ACME Rover X1
+RRCF: READY / COMPLIANT
+
+CONTROL
+  Forward       -1.0 to +1.0 m/s
+  Rotation      -2.0 to +2.0 rad/s
+
+TELEMETRY
+  Battery · Velocity · IMU · GPS
+
+SAFETY
+  E-stop · Watchdog · GuardRails
+
+INTERFACES
+  WebSocket · ROS2 · MQTT
+
+ADAPTER
+  org.acme.rover-x1.adptr</pre>
+      </div>
+    </div>
+    <div class="section-actions">
+      <a class="btn btn-primary" href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md#19-rrcf-as-a-robot-integration-manual"><span class="icon" data-icon="doc"></span>Read Integration Manual spec §19</a>
+    </div>
+  </div>
+</section>
+
 
 <section id="tools">
   <div class="container">
@@ -510,12 +643,13 @@ FAIL  no-telemetry-endpoint.rrcf
       </div>
       <div class="tool-card">
         <h3><span class="icon" data-icon="doc"></span>Specification</h3>
-        <p>The full RFC-style spec — motivation, schema, wire format, conformance requirements, and governance roadmap.</p>
-        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf">Read PDF</a>
+        <p>The full RFC-style spec — motivation, schema, wire format, guard rails, registry &amp; discovery, integration manual, conformance requirements, and governance roadmap.</p>
+        <a class="btn btn-primary" href="spec/">Read v0.6 Spec</a>
+        <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md" style="margin-top:6px;">View on GitHub</a>
       </div>
       <div class="tool-card">
         <h3><span class="icon" data-icon="controller"></span>Controller Reference (React)</h3>
-        <p>A working React operator console driven entirely from the category declaration. Covers nine of the twelve categories — <code>industrial_vehicle</code>, <code>agri_vehicle</code>, and <code>custom</code> are specified but not yet implemented here.</p>
+        <p>A working React operator console driven entirely from the category declaration. Covers nine of the thirteen categories — <code>industrial_vehicle</code>, <code>agri_vehicle</code>, <code>road_vehicle</code>, and <code>custom</code> are specified but not yet implemented here.</p>
         <a class="btn btn-secondary" href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation">View on GitHub</a>
       </div>
       <div class="tool-card">
@@ -549,10 +683,10 @@ FAIL  no-telemetry-endpoint.rrcf
     <table class="stack-table">
       <thead><tr><th>Version</th><th>Planned additions</th></tr></thead>
       <tbody>
-        <tr class="highlight"><td>RRCF-1.0</td><td>12 categories, all 5 pillars, 5 input modalities</td></tr>
-        <tr><td>RRCF-1.1</td><td>Voice modality refinements, gesture spec, XR training</td></tr>
-        <tr><td>RRCF-2.0</td><td>World-context block, benchmarking, RL reward hints, medical/surgical/soft-robot categories</td></tr>
-        <tr><td>RRCF-3.0</td><td>Neural interface, zero-G thruster primitive</td></tr>
+        <tr class="highlight"><td>RRCF-1.0</td><td>13 categories, all 5 pillars, 5 input modalities, vehicle control-binding &amp; authority tiers, data replay, environment declaration, composition, identity/lifecycle, two-tier VLA conformance, guard rails (§17), registry &amp; discovery (§18), robot integration manual (§19)</td></tr>
+        <tr><td>RRCF-1.1</td><td>Voice modality refinements, gesture spec, XR training, <code>tactile_glove</code>/<code>tactile_arm</code> haptic input, <code>bci</code> draft</td></tr>
+        <tr><td>RRCF-2.0</td><td>World-context block, benchmarking, RL reward hints; new categories: medical_endoscopic, surgical, micro_robot, exoskeleton, soft_robot, swarm_node</td></tr>
+        <tr><td>RRCF-3.0</td><td>Neural interface, zero-G thruster primitive; new categories: nano_robot, space_zero_g, neural_interface</td></tr>
       </tbody>
     </table>
     <p class="section-sub" style="margin-top:24px;">
@@ -571,8 +705,9 @@ FAIL  no-telemetry-endpoint.rrcf
     <div class="footer-grid">
       <div class="footer-col">
         <div class="footer-heading">Specification</div>
-        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v04_RFC_Specification.pdf"><span class="icon" data-icon="doc"></span>Read the Spec (v0.4)</a>
-        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/RRCF_v02_RFC_Specification.pdf"><span class="icon" data-icon="doc"></span>Spec v0.2 (archive)</a>
+        <a href="spec/"><span class="icon" data-icon="doc"></span>Read the Spec (v0.6)</a>
+        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md"><span class="icon" data-icon="doc"></span>Spec v0.6 (Markdown)</a>
+        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v04_RFC_Specification.md"><span class="icon" data-icon="doc"></span>Spec v0.4 (archive)</a>
         <a href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/rrca.md"><span class="icon" data-icon="cpu"></span>RRCA Architecture</a>
         <a href="https://github.com/rrcf-foundation/RRCF/blob/main/architecture/adapter-package.md"><span class="icon" data-icon="layers"></span>Adapter Package Format</a>
         <a href="https://github.com/rrcf-foundation/RRCF/blob/main/rrcf-adoption-guide.md"><span class="icon" data-icon="book"></span>Adoption Guide</a>
