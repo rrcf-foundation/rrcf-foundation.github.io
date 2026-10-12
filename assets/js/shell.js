@@ -58,6 +58,7 @@
       { href: r('index.html') + '#what',          icon: 'bolt',     label: 'Why RRCF',    key: 'home' },
       { href: r('index.html') + '#rrca',           icon: 'cpu',      label: 'Architecture', key: 'home' },
       { href: r('registry/index.html'),            icon: 'database', label: 'Registry',     key: 'registry' },
+      { href: r('demo/index.html'),                icon: 'play',     label: 'Demo',         key: 'demo' },
       { href: r('index.html') + '#tools',          icon: 'wrench',   label: 'Resources',    key: 'home' },
     ];
   }
@@ -152,6 +153,11 @@
       '      <nav class="links" aria-label="' + navLabel + '">',
       '        ' + navLinks,
       '      </nav>',
+      '      <!-- ── Subscribe / contact button ── -->',
+      '      <button class="nav-subscribe-btn" id="subscribeToggle" type="button" aria-haspopup="dialog" aria-expanded="false">',
+      '        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true"><path d="M4 4h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Z"/><path d="M4 4l8 9 8-9"/></svg>',
+      '        Stay&nbsp;updated',
+      '      </button>',
       '      <!-- ── All Tools & Docs dropdown ── -->',
       '      <div class="nav-dropdown" id="siteDropdown">',
       '        <div class="dd-backdrop" id="ddBackdrop"></div>',
@@ -213,7 +219,35 @@
     ].join('\n');
   }
 
-  /* ── 8. Inject header + footer, then wire up icons + dropdown ── */
+  /* ── 9. Build subscribe modal HTML ── */
+  function buildModal() {
+    return [
+      '<div class="subscribe-modal-overlay" id="subscribeOverlay" role="dialog" aria-modal="true" aria-label="Stay updated — RRCF">',
+      '  <div class="subscribe-modal">',
+      '    <div class="subscribe-modal-head">',
+      '      <span class="subscribe-modal-title">',
+      '        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true"><path d="M4 4h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Z"/><path d="M4 4l8 9 8-9"/></svg>',
+      '        Stay updated',
+      '      </span>',
+      '      <button class="subscribe-modal-close" id="subscribeClose" type="button" aria-label="Close">',
+      '        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+      '      </button>',
+      '    </div>',
+      '    <p class="subscribe-modal-sub">Get notified about RRCF spec updates, new adapters, and community releases.</p>',
+      '    <div class="subscribe-modal-frame">',
+      '      <iframe',
+      '        src="https://docs.google.com/forms/d/e/1FAIpQLSc6bU_5X12_0wFeZGBwRs4jsPvTln5Qql61zbEH5XZ05VEH7A/viewform?embedded=true"',
+      '        width="100%" height="520" frameborder="0" marginheight="0" marginwidth="0"',
+      '        title="RRCF stay-updated form" loading="lazy">',
+      '        Loading…',
+      '      </iframe>',
+      '    </div>',
+      '  </div>',
+      '</div>',
+    ].join('\n');
+  }
+
+  /* ── 8. Inject header + footer + modal, then wire up everything ── */
   function inject() {
     // Header: prepend to body
     var headerEl = document.createElement('div');
@@ -226,6 +260,13 @@
       var footerEl = document.createElement('div');
       footerEl.innerHTML = buildFooter();
       document.body.appendChild(footerEl.firstChild);
+    }
+
+    // Subscribe modal: append once
+    if (!document.getElementById('subscribeOverlay')) {
+      var modalEl = document.createElement('div');
+      modalEl.innerHTML = buildModal();
+      document.body.appendChild(modalEl.firstChild);
     }
 
     // Re-register theme toggle buttons that now exist in the injected header
@@ -253,6 +294,27 @@
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
       menu.querySelectorAll('.dd-link').forEach(function (a) { a.addEventListener('click', closeMenu); });
     }
+
+    // Subscribe modal toggle
+    var subBtn     = document.getElementById('subscribeToggle');
+    var subOverlay = document.getElementById('subscribeOverlay');
+    var subClose   = document.getElementById('subscribeClose');
+    function openModal()  {
+      if (subOverlay) { subOverlay.classList.add('open'); subOverlay.removeAttribute('hidden'); }
+      if (subBtn)     subBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      if (subOverlay) { subOverlay.classList.remove('open'); }
+      if (subBtn)     subBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    if (subBtn)     subBtn.addEventListener('click', openModal);
+    if (subClose)   subClose.addEventListener('click', closeModal);
+    if (subOverlay) subOverlay.addEventListener('click', function(e) {
+      if (e.target === subOverlay) closeModal();
+    });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 
   }
 

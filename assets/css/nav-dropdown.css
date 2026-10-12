@@ -85,39 +85,100 @@ nav.links a:hover { color: var(--accent) !important; }
 }
 .pillar-card .card-icon svg { width: 26px; height: 26px; display: block; }
 
-/* ── Demo featured CTA block ─────────────────────────────────────── */
-.demo-cta {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px; margin: 18px 0 14px;
-  background: var(--accent-soft);
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  color: var(--text);
-  text-decoration: none;
-  transition: background .15s, border-color .15s, transform .12s;
-  max-width: 520px;
+/* ── Demo compact button (hero) ──────────────────────────────────── */
+.btn-demo {
+  background: var(--accent);
+  color: var(--button-text) !important;
+  border-color: var(--accent);
+  font-weight: 700;
+  font-size: 13.5px;
+  gap: 7px;
+  margin-top: 6px;
 }
-.demo-cta:hover {
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
+.btn-demo:hover {
+  background: var(--accent-strong);
   border-color: var(--accent-strong);
-  transform: translateY(-1px);
+  color: var(--button-text) !important;
   text-decoration: none;
 }
-.demo-cta-icon {
-  display: flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px; border-radius: 10px;
+.btn-demo svg { flex-shrink: 0; }
+
+/* ── Subscribe / Stay updated nav button ─────────────────────────── */
+.nav-subscribe-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent); background: var(--accent-soft);
+  border: 1.5px solid var(--accent); cursor: pointer;
+  font-family: var(--sans); white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.nav-subscribe-btn:hover {
   background: var(--accent); color: var(--button-text);
+}
+.nav-subscribe-btn svg { flex-shrink: 0; }
+
+/* ── Subscribe modal overlay ─────────────────────────────────────── */
+.subscribe-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0, 0, 0, 0.55);
+  align-items: center; justify-content: center;
+  padding: 16px;
+}
+.subscribe-modal-overlay.open { display: flex; }
+
+.subscribe-modal {
+  background: var(--panel);
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.22);
+  width: 100%; max-width: 520px;
+  max-height: calc(100vh - 48px);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.subscribe-modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--line);
   flex-shrink: 0;
 }
-.demo-cta-icon svg { width: 22px; height: 22px; display: block; }
-.demo-cta-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.demo-cta-label { font-weight: 800; font-size: 15px; color: var(--accent); line-height: 1.2; }
-.demo-cta-sub { font-size: 12.5px; color: var(--dim); line-height: 1.4; }
-.demo-cta-arrow { font-size: 18px; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+.subscribe-modal-title {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 800; font-size: 16px; color: var(--text);
+}
+.subscribe-modal-title svg { color: var(--accent); flex-shrink: 0; }
+.subscribe-modal-close {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: transparent; border: 1px solid var(--line);
+  color: var(--dim); cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.subscribe-modal-close:hover { background: var(--bg-alt); color: var(--text); }
 
-/* ── Mobile dropdown adjustment ─────────────────────────────────── */
+.subscribe-modal-sub {
+  margin: 0; padding: 12px 20px 0;
+  font-size: 13.5px; color: var(--dim); line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.subscribe-modal-frame {
+  flex: 1; overflow-y: auto; padding: 12px 8px 8px;
+}
+.subscribe-modal-frame iframe {
+  display: block; border: none; width: 100%;
+  min-height: 480px; border-radius: 8px;
+}
+
+/* ── Mobile adjustments ──────────────────────────────────────────── */
 @media (max-width: 700px) {
   .nav-dropdown-panel { min-width: calc(100vw - 24px); right: -12px; }
   .nav-dropdown.open .nav-dropdown-panel { grid-template-columns: 1fr; }
-  .demo-cta { max-width: 100%; }
+  .subscribe-modal { max-height: calc(100vh - 24px); border-radius: 12px; }
+  .nav-subscribe-btn [data-label] { display: none; }
+}
+@media (max-width: 480px) {
+  .nav-subscribe-btn span:not(svg) { display: none; }
 }
