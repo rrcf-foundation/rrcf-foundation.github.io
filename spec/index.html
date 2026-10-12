@@ -7,6 +7,7 @@
 <meta name="description" content="The RRCF v0.6 draft specification — the Operator Interface Declaration Standard for Physical AI. Rendered from the canonical Markdown source.">
 <script src="../assets/js/theme.js?v=20260911-contract"></script>
 <link rel="stylesheet" href="../assets/css/style.css?v=20260911-contract">
+<link rel="stylesheet" href="../assets/css/nav-dropdown.css?v=20260911-contract">
 <style>
   .spec-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; align-items: start; }
   .spec-toc { position: sticky; top: 84px; max-height: calc(100vh - 104px); overflow-y: auto; font-size: 13px; border-right: 1px solid var(--line); padding-right: 16px; }
@@ -36,21 +37,15 @@
 </style>
 </head>
 <body>
-
-<header class="site-nav">
-  <div class="container">
-    <a class="brand" href="../index.html" aria-label="RRCF home"><img src="../assets/images/rrcf_logo.png" alt="" style="height:26px;width:auto;display:block;"><span>RRCF</span></a>
-    <div class="nav-actions">
-      <nav class="links" aria-label="Specification navigation">
-        <a class="nav-secondary" href="../index.html#what">Why RRCF</a>
-        <a class="nav-secondary" href="../index.html#guardrails">New in v0.6</a>
-        <a class="nav-mobile" href="../registry/index.html">Registry</a>
-        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md"><span class="icon" data-icon="github"></span>Source</a>
-      </nav>
-      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span data-theme-icon aria-hidden="true">☾</span><span data-theme-label>Dark</span></button>
-    </div>
-  </div>
-</header>
+<script>
+window.RRCF_NAV_LINKS = [
+  { href: '../index.html#what',                                                                                                    icon: 'bolt',   label: 'Why RRCF' },
+  { href: '../index.html#guardrails',                                                                                              icon: 'layers', label: 'New in v0.6' },
+  { href: '../registry/index.html',                                                                                                icon: 'database', label: 'Registry' },
+  { href: 'https://github.com/rrcf-foundation/RRCF/blob/main/spec/RRCF_v06_RFC_Specification.md', icon: 'github',  label: 'Source' },
+];
+</script>
+<script src="../assets/js/shell.js?v=20260911-contract"></script>
 
 <section class="hero hero-compact">
   <div class="container content-narrow">
@@ -77,16 +72,6 @@
     </div>
   </div>
 </section>
-
-<footer>
-  <div class="container">
-    <span>© 2026 RRCF Foundation · Apache License 2.0</span>
-    <nav class="links">
-      <a href="../index.html">Home</a>
-      <a href="https://github.com/rrcf-foundation/RRCF">GitHub</a>
-    </nav>
-  </div>
-</footer>
 
 <script>
 // Canonical source: the Markdown spec lives in the RRCF repo. We render it here
