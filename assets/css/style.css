@@ -62,6 +62,21 @@ html { scroll-behavior: smooth; scroll-padding-top: 78px; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.65; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+/* ── Explicit inline links — always underlined, never invisible ── */
+/* Applied to prose body links that are NOT buttons/nav/footer */
+p a, li a, .section-sub a, .inline-note a, .content-list a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+p a:hover, li a:hover, .section-sub a:hover,
+.inline-note a:hover, .content-list a:hover {
+  color: var(--accent-strong);
+  text-decoration-thickness: 2px;
+}
 button, a { -webkit-tap-highlight-color: transparent; }
 a:focus-visible, button:focus-visible { outline: none; box-shadow: var(--focus); border-radius: 6px; }
 code { font-family: var(--mono); }
@@ -113,9 +128,16 @@ nav.links .icon { width: 14px; height: 14px; }
 .hero p.lead { max-width: 620px; margin: 0 0 32px; font-size: clamp(16px, 1.4vw, 20px); color: var(--dim); line-height: 1.65; }
 .hero-actions, .section-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .hero-actions { margin-bottom: 20px; }
-.resource-links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; }
-.resource-links a { display: inline-flex; align-items: center; gap: 6px; color: var(--dim); }
-.resource-links a:hover { color: var(--accent); text-decoration: none; }
+.resource-links { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13.5px; margin-top: 4px; }
+.resource-links a {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--accent); font-weight: 700;
+  border-bottom: 2px solid var(--accent-soft);
+  padding-bottom: 1px;
+  transition: border-color .15s, color .15s;
+}
+.resource-links a:hover { color: var(--accent-strong); border-color: var(--accent); text-decoration: none; }
+.resource-links .icon { width: 15px; height: 15px; }
 .hero-img { margin: 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); }
 .hero-img img { display: block; width: 100%; height: auto; }
 .hero-compact { padding: 54px 0 46px; text-align: left; }

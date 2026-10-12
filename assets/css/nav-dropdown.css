@@ -85,8 +85,39 @@ nav.links a:hover { color: var(--accent) !important; }
 }
 .pillar-card .card-icon svg { width: 26px; height: 26px; display: block; }
 
+/* ── Demo featured CTA block ─────────────────────────────────────── */
+.demo-cta {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; margin: 18px 0 14px;
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  color: var(--text);
+  text-decoration: none;
+  transition: background .15s, border-color .15s, transform .12s;
+  max-width: 520px;
+}
+.demo-cta:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-color: var(--accent-strong);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.demo-cta-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--accent); color: var(--button-text);
+  flex-shrink: 0;
+}
+.demo-cta-icon svg { width: 22px; height: 22px; display: block; }
+.demo-cta-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.demo-cta-label { font-weight: 800; font-size: 15px; color: var(--accent); line-height: 1.2; }
+.demo-cta-sub { font-size: 12.5px; color: var(--dim); line-height: 1.4; }
+.demo-cta-arrow { font-size: 18px; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
 /* ── Mobile dropdown adjustment ─────────────────────────────────── */
 @media (max-width: 700px) {
   .nav-dropdown-panel { min-width: calc(100vw - 24px); right: -12px; }
   .nav-dropdown.open .nav-dropdown-panel { grid-template-columns: 1fr; }
+  .demo-cta { max-width: 100%; }
 }
