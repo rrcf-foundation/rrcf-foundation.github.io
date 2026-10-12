@@ -12,9 +12,7 @@
   function persistTheme(theme) {
     try {
       localStorage.setItem(storageKey, theme);
-    } catch (_) {
-      // Theme selection still works for this page when storage is unavailable.
-    }
+    } catch (_) {}
   }
 
   function updateControls(theme) {
@@ -29,7 +27,7 @@
     });
   }
 
-  function applyTheme(theme, persist = false) {
+  function applyTheme(theme, persist) {
     const nextTheme = theme === 'dark' ? 'dark' : 'light';
     document.documentElement.dataset.theme = nextTheme;
     document.documentElement.style.colorScheme = nextTheme;
@@ -38,21 +36,35 @@
     window.dispatchEvent(new CustomEvent('rrcf-themechange', { detail: { theme: nextTheme } }));
   }
 
+  // Wire up a single toggle button that may have been injected after DOMContentLoaded
+  function wireButton(button) {
+    if (button._rrcfWired) return;
+    button._rrcfWired = true;
+    button.addEventListener('click', () => {
+      const current = document.documentElement.dataset.theme || 'light';
+      applyTheme(current === 'dark' ? 'light' : 'dark', true);
+    });
+    updateControls(document.documentElement.dataset.theme || 'light');
+  }
+
+  // Re-scan the document for any toggle buttons not yet wired — called by shell.js
+  function reRegister() {
+    document.querySelectorAll('[data-theme-toggle]').forEach(wireButton);
+    updateControls(document.documentElement.dataset.theme || 'light');
+  }
+
+  // Apply saved theme immediately (before paint — no flash)
   applyTheme(readTheme());
 
-  document.addEventListener('DOMContentLoaded', () => {
-    updateControls(document.documentElement.dataset.theme || 'light');
-    document.querySelectorAll('[data-theme-toggle]').forEach(button => {
-      button.addEventListener('click', () => {
-        const current = document.documentElement.dataset.theme || 'light';
-        applyTheme(current === 'dark' ? 'light' : 'dark', true);
-      });
-    });
-  });
+  document.addEventListener('DOMContentLoaded', reRegister);
 
   window.addEventListener('storage', event => {
     if (event.key === storageKey) applyTheme(event.newValue === 'dark' ? 'dark' : 'light');
   });
 
-  window.RRCFTheme = { apply: theme => applyTheme(theme, true), current: () => document.documentElement.dataset.theme || 'light' };
+  window.RRCFTheme = {
+    apply: theme => applyTheme(theme, true),
+    current: () => document.documentElement.dataset.theme || 'light',
+    reRegister,
+  };
 })();

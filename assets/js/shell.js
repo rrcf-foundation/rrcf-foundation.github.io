@@ -228,6 +228,11 @@
       document.body.appendChild(footerEl.firstChild);
     }
 
+    // Re-register theme toggle buttons that now exist in the injected header
+    if (window.RRCFTheme && window.RRCFTheme.reRegister) {
+      window.RRCFTheme.reRegister();
+    }
+
     // Load icons.js dynamically (same assets/js/ folder)
     var iconsScript = document.createElement('script');
     iconsScript.src = prefix + 'assets/js/icons.js';
@@ -249,8 +254,6 @@
       menu.querySelectorAll('.dd-link').forEach(function (a) { a.addEventListener('click', closeMenu); });
     }
 
-    // Re-fire theme.js icon state update in case it ran before header was inserted
-    if (window.__themeApply) window.__themeApply();
   }
 
   // Run after the DOM is ready
