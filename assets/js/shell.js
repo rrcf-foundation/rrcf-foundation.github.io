@@ -185,7 +185,7 @@
       '    <div class="footer-top">',
       '      <img src="https://raw.githubusercontent.com/rrcf-foundation/RRCF/main/images/rrcf_FULL_TRANSPARENT.png" alt="RRCF" class="footer-logo">',
       '    </div>',
-      '    <div class="footer-grid">',
+      '    <div class="footer-grid footer-grid-4">',
       '      <div class="footer-col">',
       '        <div class="footer-heading">Specification</div>',
       '        <a href="' + r('spec/') + '"><span class="icon" data-icon="doc"></span>Read the Spec (v0.6)</a>',
@@ -197,20 +197,31 @@
       '      </div>',
       '      <div class="footer-col">',
       '        <div class="footer-heading">Tools</div>',
-      '        <a href="' + r('tools/converter.html') + '"><span class="icon" data-icon="sync"></span>URDF/MJCF/SDF Converter</a>',
       '        <a href="' + r('demo/index.html') + '"><span class="icon" data-icon="play"></span>Live Controller Demo</a>',
+      '        <a href="' + r('tools/converter.html') + '"><span class="icon" data-icon="sync"></span>URDF/MJCF/SDF Converter</a>',
       '        <a href="' + r('registry/index.html') + '"><span class="icon" data-icon="database"></span>Adapter Registry</a>',
       '        <a href="https://github.com/rrcf-foundation/RRCF/tree/main/conformance"><span class="icon" data-icon="shield"></span>Conformance CLI</a>',
       '        <a href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation"><span class="icon" data-icon="controller"></span>Reference Implementation</a>',
       '        <a href="https://github.com/rrcf-foundation/RRCF/tree/main/reference-implementation/rrcf_ros2_bridge"><span class="icon" data-icon="network"></span>ROS 2 Bridge</a>',
       '      </div>',
       '      <div class="footer-col">',
-      '        <div class="footer-heading">Community</div>',
-      '        <a href="https://github.com/rrcf-foundation/RRCF"><span class="icon" data-icon="github"></span>GitHub Repository</a>',
-      '        <a href="https://github.com/rrcf-foundation/RRCF/issues/new"><span class="icon" data-icon="flag"></span>Open an Issue</a>',
+      '        <div class="footer-heading">Registry &amp; Conformance</div>',
+      '        <a href="' + r('registry/index.html') + '"><span class="icon" data-icon="database"></span>Adapter Registry</a>',
+      '        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/README.md"><span class="icon" data-icon="book"></span>Publication Guidance</a>',
+      '        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/schema/adapter-manifest.schema.json"><span class="icon" data-icon="lock"></span>Manifest Schema</a>',
       '        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/conformance/profiles/category-profiles.json"><span class="icon" data-icon="chart"></span>Category Profiles</a>',
       '        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/conformance/schema/rrcf-declaration.schema.json"><span class="icon" data-icon="lock"></span>Declaration Schema</a>',
-      '        <a href="https://github.com/rrcf-foundation/RRCF/blob/main/registry/README.md"><span class="icon" data-icon="database"></span>Registry Guidance</a>',
+      '        <a href="https://github.com/rrcf-foundation/RRCF/issues/new"><span class="icon" data-icon="flag"></span>Propose an Adapter</a>',
+      '      </div>',
+      '      <div class="footer-col">',
+      '        <div class="footer-heading">Connect</div>',
+      '        <a href="https://github.com/rrcf-foundation/RRCF"><span class="icon" data-icon="github"></span>GitHub Repository</a>',
+      '        <a href="https://github.com/rrcf-foundation/RRCF/issues"><span class="icon" data-icon="flag"></span>Issues &amp; Discussions</a>',
+      '        <a href="https://github.com/rrcf-foundation/RRCF/issues/new"><span class="icon" data-icon="edit"></span>Open an Issue</a>',
+      '        <button class="footer-contact-btn" id="footerSubscribeBtn" type="button">',
+      '          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" aria-hidden="true"><path d="M4 4h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Z"/><path d="M4 4l8 9 8-9"/></svg>',
+      '          Stay updated / Contact',
+      '        </button>',
       '      </div>',
       '    </div>',
       '    <div class="footer-bottom">© 2026 RRCF Foundation. Published under Apache License 2.0.</div>',
@@ -315,6 +326,10 @@
       if (e.target === subOverlay) closeModal();
     });
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+    // Footer "Stay updated / Contact" button — opens the same modal
+    var footerSubBtn = document.getElementById('footerSubscribeBtn');
+    if (footerSubBtn) footerSubBtn.addEventListener('click', openModal);
 
   }
 

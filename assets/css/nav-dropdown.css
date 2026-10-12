@@ -173,12 +173,35 @@ nav.links a:hover { color: var(--accent) !important; }
 }
 
 /* ── Mobile adjustments ──────────────────────────────────────────── */
+/* ── 4-column footer grid ────────────────────────────────────────── */
+.footer-grid-4 { grid-template-columns: repeat(4, 1fr) !important; }
+
+/* ── Footer contact / stay-updated button ────────────────────────── */
+.footer-contact-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 12px; margin-top: 4px;
+  border-radius: 7px; border: 1.5px solid var(--accent);
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 12.5px; font-weight: 700;
+  font-family: var(--sans); cursor: pointer; white-space: nowrap;
+  transition: background .15s, color .15s;
+  text-align: left;
+}
+.footer-contact-btn:hover { background: var(--accent); color: var(--button-text); }
+.footer-contact-btn svg { flex-shrink: 0; }
+
+/* ── Mobile adjustments ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .footer-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+}
 @media (max-width: 700px) {
   .nav-dropdown-panel { min-width: calc(100vw - 24px); right: -12px; }
   .nav-dropdown.open .nav-dropdown-panel { grid-template-columns: 1fr; }
   .subscribe-modal { max-height: calc(100vh - 24px); border-radius: 12px; }
   .nav-subscribe-btn [data-label] { display: none; }
+  .footer-grid-4 { grid-template-columns: 1fr 1fr !important; }
 }
 @media (max-width: 480px) {
   .nav-subscribe-btn span:not(svg) { display: none; }
+  .footer-grid-4 { grid-template-columns: 1fr !important; }
 }
